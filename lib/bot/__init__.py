@@ -293,5 +293,7 @@ class Bot(BotBase):
             print('>>>>>>>> elif self.check7:')
             apos = "'"
             await message.channel.send(f"{choice(('Doing great! :sunglasses:', 'Feeling productive! :muscle:', f'I{apos}m good! Thanks for asking, {message.author.mention}! :wink:'))}")
+        else:
+            print('>>>>>>>> casualMessaging: else')
 
 bot = Bot()

@@ -1,3 +1,4 @@
+from random import choice
 from requests import get
 from datetime import datetime
 from discord import Embed
@@ -17,6 +18,7 @@ async def autoWeatherForecast(city):
         geocode = get(f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=5&appid={api_key}").json()
         lat, lon = geocode[0]['lat'], geocode[0]['lon']
         exclude_parts = "current,minutely,daily,alerts"
+        random_eula_stickers = open("./data/db/Eula_chibi.stickers").read().splitlines()
         x = get(f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude_parts}&appid={api_key}").json()
         if 'hourly' in x:
             embed = Embed(title=f"{city.upper()}, {datetime.now().strftime('%Y-%m-%d')}", description="6-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
@@ -27,7 +29,7 @@ async def autoWeatherForecast(city):
                                                             x['hourly'][hours]['weather'][0]['description'], binary[hours%2]))
             for name, value, inline in field:
                 embed.add_field(name=name, value=value, inline=inline)
-            embed.set_thumbnail(url="https://c.tenor.com/N-eXz-9D2kgAAAAi/eula-genshin.gif")
+            embed.set_thumbnail(url=choice((random_eula_stickers)))
             embed.set_footer(text=f"Scheduled forecast")
             return embed
         else:

@@ -73,6 +73,7 @@ class Bot(BotBase):
         self.guild = None
         self.scheduler = AsyncIOScheduler()
         self.timekeeper = TimeKeeper()
+        self.random_eula_stickers = open("./data/db/Eula_chibi.stickers").read().splitlines()
         db.autosave(self.scheduler)
         
         super().__init__(
@@ -189,7 +190,7 @@ class Bot(BotBase):
                                                             x['hourly'][hours]['weather'][0]['description'], binary[hours%2]))
                 for name, value, inline in field:
                     self.weather_embed.add_field(name=name, value=value, inline=inline)
-                self.weather_embed.set_thumbnail(url="https://c.tenor.com/N-eXz-9D2kgAAAAi/eula-genshin.gif")
+                self.weather_embed.set_thumbnail(url=choice((self.random_eula_stickers)))
                 self.weather_embed.set_footer(text=f"Requested by {message.author.name}")
             await message.channel.send(embed=self.weather_embed)
         else:

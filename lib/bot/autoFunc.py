@@ -33,7 +33,7 @@ async def autoWeatherForecast(city):
             embed.set_footer(text=f"Scheduled forecast")
             return embed
         else:
-            print("Sorry, I can't fetch the weather data... ")
+            return "Sorry, I can't fetch the weather data... "
 
 async def autoLogIp():
         print(">> Logging IP automatically")

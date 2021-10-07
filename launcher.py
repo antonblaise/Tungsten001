@@ -1,7 +1,6 @@
 from lib.bot import bot
 import os
 
-VERSION = "1.4.3"
+VERSION = "1.2.1"
 
-os.system('cls' if os.name == 'nt' else 'clear')
 bot.run(VERSION)

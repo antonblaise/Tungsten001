@@ -7,11 +7,13 @@ async def autoWeatherForecast(city):
         icon_codes = ['01d','02d','03d','04d',
                         '09d','10d','11d','13d',
                         '50d','01n','02n','03n',
-                        '04n']
+                        '04n','10n','11n','13n',
+                        '50n']
         emojis = [':sunny:',':partly_sunny:',':white_sun_cloud:',':cloud:',
                         ':cloud_rain:',':white_sun_rain_cloud:', ':cloud_lightning:',':snowflake:',
                         ':fog:',':sunny:',':partly_sunny:',':white_sun_cloud:',
-                        ':cloud:']
+                        ':cloud:',':white_sun_rain_cloud:',':cloud_lightning:',':snowflake:',
+                        ':fog:']
         geocode = get(f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=5&appid={api_key}").json()
         lat, lon = geocode[0]['lat'], geocode[0]['lon']
         exclude_parts = "current,minutely,daily,alerts"

@@ -156,7 +156,7 @@ class Bot(BotBase):
         await message.channel.send(self.ip_report)
 
     async def auto_weather_forecast(self):
-        cities = ["Sibu","Kuching"]
+        cities = ["Sibu","Kota Samarahan"]
         for c in cities:
             embed = await autoWeatherForecast(c)
             await self.stdout.send(embed=embed)

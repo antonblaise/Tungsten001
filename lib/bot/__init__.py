@@ -273,13 +273,22 @@ class Bot(BotBase):
         self.check7 = bool([ele for ele in ["how are you","how's it going"] if(ele in message.content.lower())])
         if self.check1:
             print('>>>>>>>> if self.check1:')
-            await message.channel.send(f"{choice(('Hello', 'Hi', 'Hey', 'Konichiwa','Good '+self.goodday.period_now))} {message.author.name}!")
+            self.reply = f"{choice(('Hello', 'Hi', 'Hey', 'Konichiwa','Good '+self.goodday.period_now))} {message.author.name}!"
+            if bool([ele for ele in ["<3",":heart:",":kissing_heart:"] if(ele in message.content.content.lower())]):
+                self.reply += f" {choice((':two_hearts: ',':heart:',':kissing_heart:'))}"
+            await message.channel.send(self.reply)
         elif self.check2:
             print('>>>>>>>> elif self.check2:')
-            await message.channel.send(f"{'Good '+self.goodday.period_now} {message.author.name}!")
+            self.reply = f"{'Good '+self.goodday.period_now} {message.author.name}!"
+            if bool([ele for ele in ["<3",":heart:",":kissing_heart:"] if(ele in message.content.content.lower())]):
+                self.reply += f" {choice((':two_hearts:',':heart:',':kissing_heart:'))}"
+            await message.channel.send(self.reply)
         elif self.check3:
             print('>>>>>>>> elif self.check3:')
-            await message.channel.send(f"Good night, {message.author.name}. {choice(('Sweet dreams.', 'Have a good sleep.', 'Hope you sleep well.'))}")
+            self.reply = f"Good night, {message.author.name}. {choice(('Sweet dreams.', 'Have a good sleep.', 'Hope you sleep well.'))}"
+            if bool([ele for ele in ["<3",":heart:",":kissing_heart:"] if(ele in message.content.content.lower())]):
+                self.reply += f" {choice((':two_hearts:',':heart:',':kissing_heart:'))}"
+            await message.channel.send(self.reply)
         elif self.check4:
             print('>>>>>>>> elif self.check4:')
             await message.channel.send(f"{choice(('No prob!', 'My pleasure!', 'Glad to help! :heart:'))}")

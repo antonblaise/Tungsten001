@@ -9,7 +9,8 @@ from requests import get
 from datetime import datetime
 import os
 
-from lib.bot.autoFunc import autoWeatherForecast, autoLogIp
+from lib.bot.autoFunc import *
+from lib.bot.messenger import *
 from ..db import db
 from glob import glob
 from discord.ext.commands import (CommandNotFound, BadArgument)
@@ -29,12 +30,13 @@ class Ready(object):
     def ready_up(self, cog): # Set the cogs to ready
         for cog in COGS:
             setattr(self, cog, True)
-            if getattr(self, cog):
-                print(f"[+] {cog} is ready!")
-            else:
-                print(f"[-] {cog} is NOT ready.")
 
     def all_ready(self): # Check if all cogs are ready, return True or False
+        for cog in COGS:
+            if getattr(self, cog):
+                print(f"[+] {cog} cog is ready!")
+            else:
+                print(f"[-] {cog} cog is NOT ready.")
         return all([getattr(self, cog) for cog in COGS])
 
 class TimeKeeper():
@@ -91,7 +93,8 @@ class Bot(BotBase):
 
     def run(self, version):
         self.VERSION = version
-
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(f"\nTungsten001 a.k.a. Eula Lawrence (v{self.VERSION})\n")
         print(">> Running setup...")
         self.setup()
 
@@ -134,10 +137,9 @@ class Bot(BotBase):
 
     async def auto_log_ip(self):
         res = await autoLogIp()
-        await self.stdout.send(get('https://ipinfo.io/').content.decode('utf8'))
+        await self.stdout.send("Doing scheduled IP check... 🧐🧐")
         await self.stdout.send(res)
         
-
     async def man_log_ip(self, message):
         print(">> Logging IP manually")
         log_path = "./data/db/ip.log"
@@ -160,7 +162,10 @@ class Bot(BotBase):
         cities = ["Sibu","Kota Samarahan"]
         for c in cities:
             embed = await autoWeatherForecast(c)
-            await self.stdout.send(embed=embed)
+            if isinstance(embed, str):
+                await self.stdout.send(embed)
+            else:
+                await self.stdout.send(embed=embed)
 
     async def weather_forecast(self, message):
         api_key = str(open("./data/db/openweathermap_api.0").read())
@@ -241,108 +246,28 @@ class Bot(BotBase):
 
     # Messaging
     async def on_message(self, message):
-        print(f"[{self.timekeeper.hour_min}] GOT MESSAGE from {message.author.name}")
-        print(f"[{self.timekeeper.hour_min}] Message: {message.content}")
-        if not message.author.bot:
-            print(f"[{self.timekeeper.hour_min}] if not message.author.bot:")
-            if isinstance(message.channel, DMChannel): # When someone PMs the bot
-                print(f"[{self.timekeeper.hour_min}] if isinstance(message.channel, DMChannel):")
-                if message.content.lower() == "ovpn":
-                    print(f"[{self.timekeeper.hour_min}] if message.content.lower() == 'ovpn':")
-                    await self.send_ovpn(message)
-                elif message.content.lower() in ["ip","ipinfo"]:
-                    print(f'[{self.timekeeper.hour_min}] elif message.content.lower() in ["ip","ipinfo"]:')
-                    await message.channel.send(get('https://ipinfo.io/').content.decode('utf8'))
-                    await self.man_log_ip(message)
-                elif message.content.lower() in ["iplog","logip"]:
-                    print(f'[{self.timekeeper.hour_min}] elif message.content.lower() in ["iplog","logip"]:')
-                    await self.man_log_ip(message)
-                else:
-                    print(f"[{self.timekeeper.hour_min}] else:")
-                    await self.casualMessaging(message)
+        print(f"[{timekeeper.hour_min}] GOT MESSAGE from {message.author.name}")
+        print(f"[{timekeeper.hour_min}] Message: {message.content}")
+        cond1 = bool(not message.author.bot)
+        cond2 = bool(not isinstance(message.channel, DMChannel))
+        cond3 = bool(not bool([ele for ele in [f'{bot.user.id}','@eula'] if(ele in message.content.lower())]))
+        if cond1:
+            if cond2 and cond3: # When someone PMs the bot
+                print(f"[{timekeeper.hour_min}] all conds fulfilled: await self.process_commands(message)")
+                await self.process_commands(message)
+                # Process commands if the message is not a DM and the bot is not mentioned
             else:
-                print(f"[{self.timekeeper.hour_min}] outer else")
-                if bool([ele for ele in [f'{bot.user.id}','@eula'] if(ele in message.content.lower())]):
-                # If someone pings the bot
-                    print(f"[{self.timekeeper.hour_min}] {message.author.name} mentioned the bot.")
-                    if [ele for ele in ["weather"] if(ele in message.content.lower())]:
-                        print(f"[{self.timekeeper.hour_min}] weather forecast on request by {message.author.name}")
-                        await self.weather_forecast(message)
-                    else:
-                        print(f"[{self.timekeeper.hour_min}] if mention in message.content:")
-                        await self.casualMessaging(message)
-                else:
-                    print(f"[{self.timekeeper.hour_min}] else: await self.process_commands(message)")
-                    await self.process_commands(message)
+                print(f"[{timekeeper.hour_min}] else: await directMessage(message)")
+                res_directMessage = await directMessage(message)
 
-    async def casualMessaging(self, message):
-        print(f'[{self.timekeeper.hour_min}] casualMessaging')
-        self.check1 = bool([ele for ele in ["hi","hello","hey"] if(ele in message.content.lower())])
-        self.check2 = bool([ele for ele in ["good morning","good evening","good afternoon"] if(ele in message.content.lower())])
-        self.check3 = bool([ele for ele in ["good night","goodnight","goodnite","g9 ","gud9"] if(ele in message.content.lower())])
-        self.check4 = bool([ele for ele in ["tq ","thank you","thx ","thanks","arigato"] if(ele in message.content.lower())])
-        self.check5 = bool([ele for ele in ["love you"] if(ele in message.content.lower())])
-        self.check6 = bool([ele for ele in ["who is this","who are you","introduce yourself","self introduce","self intro"] if(ele in message.content.lower())])
-        self.check7 = bool([ele for ele in ["how are you","how's it going"] if(ele in message.content.lower())])
-        self.subcheck1 = bool([ele for ele in ["❤️","😘","💕"] if(ele in message.content)])
-        self.random_hearts = choice(("❤️","😘","💕"))
-        print(f"[{self.timekeeper.hour_min}] subcheck: {self.subcheck1}")
-        if self.check1:
-            print(f'[{self.timekeeper.hour_min}] if self.check1:')
-            self.reply = f"{choice(('Hello', 'Hi', 'Hey', 'Konichiwa','Good '+self.timekeeper.period_now))} {message.author.name}! "
-            if self.subcheck1:
-                print(f'[{self.timekeeper.hour_min}] Adding random heart emojis')
-                for _ in range(randint(1, 3)):
-                    self.reply += f'{choice(("❤️","😘","💕"))}'
-            print(f"[{self.timekeeper.hour_min}] FINAL REPLY: {self.reply}")
-            await message.channel.send(self.reply)
-        elif self.check2:
-            print(f'[{self.timekeeper.hour_min}] elif self.check2:')
-            self.reply = f"{'Good '+self.timekeeper.period_now} {message.author.name}! "
-            if self.subcheck1:
-                print(f'[{self.timekeeper.hour_min}] Adding random heart emojis')
-                for _ in range(randint(1, 3)):
-                    self.reply += f'{choice(("❤️","😘","💕"))}'
-            print(f"[{self.timekeeper.hour_min}] FINAL REPLY: {self.reply}")
-            await message.channel.send(self.reply)
-        elif self.check3:
-            print(f'[{self.timekeeper.hour_min}] elif self.check3:')
-            self.reply = f"Good night, {message.author.name}. {choice(('Sweet dreams.', 'Have a good sleep.', 'Hope you sleep well.'))} "
-            if self.subcheck1:
-                print(f'[{self.timekeeper.hour_min}] Adding random heart emojis')
-                for _ in range(randint(1, 3)):
-                    self.reply += f'{choice(("❤️","😘","💕"))}'
-            print(f"[{self.timekeeper.hour_min}] FINAL REPLY: {self.reply}")
-            await message.channel.send(self.reply)
-        elif self.check4:
-            print(f'[{self.timekeeper.hour_min}] elif self.check4:')
-            await message.channel.send(f"{choice(('No prob!', 'My pleasure!', 'Glad to help! :heart:'))} ")
-        elif self.check5:
-            print(f'[{self.timekeeper.hour_min}] elif self.check5:')
-            self.reply = f"{choice(('Love you too!', '', 'Love you!'))} "
-            for _ in range(randint(0, 4)):
-                self.reply += f'{choice(("❤️","😘","💕"))}'
-            self.reply += f" {message.author.mention}"
-            print(f"[{self.timekeeper.hour_min}] FINAL REPLY: {self.reply}")
-            await message.channel.send(self.reply)
-        elif self.check6:
-            print(f'[{self.timekeeper.hour_min}] elif self.check6:')
+        try:
+            print(f"[{timekeeper.hour_min}] res_directMessage: {res_directMessage}")
+        except:
+            print(f"[{timekeeper.hour_min}] exception: {Exception}")
+
+        if res_directMessage == "weather forecast request":
+            await self.weather_forecast(message)
+        elif res_directMessage == "name card":
             await self.name_card(message)
-        elif self.check7:
-            print(f'[{self.timekeeper.hour_min}] elif self.check7:')
-            apos = "'"
-            await message.channel.send(f"{choice(('Doing great! :sunglasses:', 'Feeling productive! :muscle:', f'I{apos}m good! Thanks for asking, {message.author.mention}! :wink:'))} ")
-        elif self.subcheck1:
-            print(f'[{self.timekeeper.hour_min}] elif self.subcheck1:')
-            print(f'[{self.timekeeper.hour_min}] Adding random heart emojis')
-            self.reply = f""
-            for _ in range(randint(1, 3)):
-                self.reply += f'{choice(("❤️","😘","💕"))}'
-            print(f"[{self.timekeeper.hour_min}] FINAL REPLY: {self.reply}")
-            await message.channel.send(self.reply)
-        else:
-            print(f'[{self.timekeeper.hour_min}] casualMessaging: else')
-
-   
-
+        
 bot = Bot()

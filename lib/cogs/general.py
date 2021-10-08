@@ -1,11 +1,14 @@
 from discord.ext.commands import Cog, command
 from apscheduler.triggers.cron import CronTrigger
 from discord import File, Embed, Activity, ActivityType
+from lib.bot import Bot
+from lib.bot.__init__ import *
 import os
 from requests import get
 from random import choice
 from datetime import datetime
 
+bot = Bot()
 
 class General(Cog):
     def __init__(self, bot):
@@ -33,7 +36,9 @@ class General(Cog):
         name=_name, type=getattr(ActivityType, _type, ActivityType.playing)
         ))
 
-    @command(name="whoisthis", aliases=["whoareyou","bot"], hidden=False, pass_context=False)
+    
+
+    @command(name="whoisthis", aliases=["whoareyou","bot"], brief='Self introduction from bot' ,hidden=False, pass_context=False)
     async def whoisthis(self, ctx):
         s = int(datetime.now().strftime("%S"))
         embed = Embed(title="Tungsten001", 
@@ -50,7 +55,12 @@ class General(Cog):
             embed.add_field(name=name, value=value, inline=inline)
         await ctx.channel.send(embed=embed)
 
-    @command(name="hello", aliases=["hi","hey"], hidden=True, pass_context=False)
+    @command(name="echo", brief='Repeat after me', hidden=True, pass_context=False)
+    async def echo(self, ctx, arg):
+        if not arg == None:
+            await ctx.channel.send(arg)
+
+    @command(name="hello", aliases=["hi","hey"], brief='Greet the bot', hidden=True, pass_context=False)
     async def greet(self, ctx):
         print(">> HELLO")
         self.hour_now = int(datetime.now().strftime("%H"))
@@ -63,12 +73,12 @@ class General(Cog):
         good = f"Good {self.period_now}"
         await ctx.send(f"{choice(('Hello', 'Hi', 'Hey', good))} {ctx.author.mention}!")
 
-    @command(name="ipinfo", aliases=["ipcheck"], pass_context=False, hidden=False)
+    @command(name="ipinfo", aliases=["ipcheck"], brief='Check home network IP info', pass_context=False, hidden=False)
     async def ip_info(self, ctx):
         self.ipInfo = get('https://ipinfo.io/').content.decode('utf8')
         await ctx.send(self.ipInfo)
     
-    @command(name="logip", aliases=["iplog"], pass_context=False, hidden=False)
+    @command(name="logip", aliases=["iplog"], brief='Record/Update the IP', pass_context=False, hidden=False)
     async def log_ip(self, ctx):
         print(">> Logging IP")
         log_path = "./data/db/ip.log"
@@ -88,7 +98,7 @@ class General(Cog):
                 self.ip_report = f"IP address has been updated on {log_content[0]}."
         await ctx.send(self.ip_report)
 
-    @command(name="ovpn", aliases=["vpncert","homevpn"], pass_context=False, hidden=False)
+    @command(name="ovpn", aliases=["vpncert","homevpn"], brief='Send the latest OpenVPN cert', pass_context=False, hidden=False)
     async def send_ovpn(self, ctx):
         timecode = datetime.now().strftime("%d%m%Y-%H%M%S")
         # Generate latest OpenVPN cert

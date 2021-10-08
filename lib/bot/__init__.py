@@ -9,12 +9,13 @@ from requests import get
 from datetime import datetime
 import os
 
-from lib.bot.autoFunc import *
-from lib.bot.messenger import *
+from utils.autoFunc import *
+from utils.messenger import *
 from ..db import db
 from glob import glob
 from discord.ext.commands import (CommandNotFound, BadArgument)
 from asyncio import sleep
+from data.db.auto_params import *
 
 PREFIX = "/"
 OWNER_IDS = [532991098822328322] # Owner
@@ -136,9 +137,15 @@ class Bot(BotBase):
         os.remove(file_path+file_name) # Remove the file to avoid cluttering
 
     async def auto_log_ip(self):
-        res = await autoLogIp()
-        await self.stdout.send("Doing scheduled IP check... 🧐🧐")
-        await self.stdout.send(res)
+        if ENABLE_AUTO_IP:
+            res = await autoLogIp()
+            if HUSH_AUTO_IP:
+                pass
+            else:
+                await self.stdout.send("Doing scheduled IP check... 🧐🧐")
+                await self.stdout.send(res)
+        else:
+            pass
         
     async def man_log_ip(self, message):
         print(">> Logging IP manually")
@@ -159,18 +166,21 @@ class Bot(BotBase):
         await message.channel.send(self.ip_report)
 
     async def auto_weather_forecast(self):
-        cities = ["Sibu","Kota Samarahan"]
-        for c in cities:
-            embed = await autoWeatherForecast(c)
-            if isinstance(embed, str):
-                await self.stdout.send(embed)
-            else:
-                await self.stdout.send(embed=embed)
+        if ENABLE_AUTO_WEATHER:
+            cities = CITIES_AUTO_WEATHER
+            for c in cities:
+                embed = await autoWeatherForecast(c)
+                if isinstance(embed, str):
+                    await self.stdout.send(embed)
+                else:
+                    await self.stdout.send(embed=embed)
+        else:
+            pass
 
-    async def weather_forecast(self, message):
+    async def weather_forecast(self, message, place):
         api_key = str(open("./data/db/openweathermap_api.0").read())
-        m = message.content.split(" ")
-        city = " ".join(i for i in m[2:])
+        
+        print(f"[{timekeeper.hour_min}] city = {place}")
         icon_codes = ['01d','02d','03d','04d',
                         '09d','10d','11d','13d',
                         '50d','01n','02n','03n',
@@ -181,13 +191,16 @@ class Bot(BotBase):
                         ':fog:',':sunny:',':partly_sunny:',':white_sun_cloud:',
                         ':cloud:',':white_sun_rain_cloud:',':cloud_lightning:',':snowflake:',
                         ':fog:']
-        geocode = get(f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=5&appid={api_key}").json()
+        geocode = get(f"http://api.openweathermap.org/geo/1.0/direct?q={place}&limit=5&appid={api_key}").json()
         lat, lon = geocode[0]['lat'], geocode[0]['lon']
         exclude_parts = "current,minutely,daily,alerts"
         x = get(f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude_parts}&appid={api_key}").json()
+        print(f"[{timekeeper.hour_min}] self = {self}")
+        print(f"[{timekeeper.hour_min}] self.stdout = {self.stdout}")
+        print(f"[{timekeeper.hour_min}] Bot.stdout = {bot.stdout}")
         if 'hourly' in x:
             async with self.stdout.typing():
-                self.weather_embed = Embed(title=f"{city.upper()}, {datetime.now().strftime('%Y-%m-%d')}", description="6-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
+                self.weather_embed = Embed(title=f"{place.upper()}, {datetime.now().strftime('%Y-%m-%d')}", description="6-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
                 field = []
                 binary = [True,False]
                 for hours in range(len(x['hourly'][0:6])):
@@ -200,14 +213,9 @@ class Bot(BotBase):
             await message.channel.send(embed=self.weather_embed)
         else:
             await message.channel.send("Sorry, I can't fetch the weather data... :worried:")
-        
-    async def print_date_time(self):
-        timeNow = datetime.now().strftime("%H:%M:%S")
-        dateToday = datetime.now().strftime("%d-%m-%Y")
-        await self.stdout.send("Time now:" + str(timeNow) + "\nDate today: " + str(dateToday))
 
     def on_connect(self):
-        print("[+] Bot connected.")
+        print(f"[+] Bot connected. self = {self}, bot = {bot}")
 
     async def on_disconnect(self):
         print("[-] Bot disconnected.")
@@ -229,9 +237,8 @@ class Bot(BotBase):
         if not self.ready:
             self.guild = self.get_guild(718122840544641084) # Discord server
             self.stdout = self.get_channel(783349409806024755) # Text channel. self.stdout can be used anywhere in this script
-            self.scheduler.add_job(self.auto_log_ip, CronTrigger(hour="4,8,12,16,20")) # Log IP every 6 hours    
-            # self.scheduler.add_job(self.timekeeper.get_period, CronTrigger(minute=0)) # Check time of day every hour
-            self.scheduler.add_job(self.auto_weather_forecast, CronTrigger(hour='6,10,14,18,22')) # Weather forecast
+            self.scheduler.add_job(self.auto_log_ip, CronTrigger(hour=HOURS_AUTO_IP)) # Log IP every 6 hours    
+            self.scheduler.add_job(self.auto_weather_forecast, CronTrigger(hour=HOURS_AUTO_WEATHER)) # Weather forecast
             self.scheduler.add_job(self.timekeeper.__init__, CronTrigger(second=0))
             self.scheduler.start()
 
@@ -251,7 +258,7 @@ class Bot(BotBase):
         cond1 = bool(not message.author.bot)
         cond2 = bool(not isinstance(message.channel, DMChannel))
         cond3 = bool(not bool([ele for ele in [f'{bot.user.id}','@eula'] if(ele in message.content.lower())]))
-        if cond1:
+        if cond1: # If the message is not from the bot
             if cond2 and cond3: # When someone PMs the bot
                 print(f"[{timekeeper.hour_min}] all conds fulfilled: await self.process_commands(message)")
                 await self.process_commands(message)
@@ -263,11 +270,17 @@ class Bot(BotBase):
         try:
             print(f"[{timekeeper.hour_min}] res_directMessage: {res_directMessage}")
         except:
-            print(f"[{timekeeper.hour_min}] exception: {Exception}")
+            pass
 
-        if res_directMessage == "weather forecast request":
-            await self.weather_forecast(message)
-        elif res_directMessage == "name card":
-            await self.name_card(message)
-        
+        try:
+            if res_directMessage == "weather forecast request":
+                m = message.content.split(" ")
+                city = " ".join(i for i in m[2:])
+                await self.weather_forecast(message, city)
+            elif res_directMessage == "name card":
+                await self.name_card(message)
+        except:
+            pass
+    
+    
 bot = Bot()

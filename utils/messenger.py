@@ -1,10 +1,13 @@
 from random import choice, randint
 from requests import get
-from discord import DMChannel
+from discord import DMChannel, Intents
 from lib.bot.__init__ import Bot, TimeKeeper
 
 timekeeper = TimeKeeper()
 bot = Bot()
+
+intents = Intents.default()
+intents.members = True
 
 async def directMessage(message):
     if isinstance(message.channel, DMChannel): # When someone PMs the bot

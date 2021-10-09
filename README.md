@@ -30,6 +30,6 @@ codenamed the toughest metal on earth, tungsten.
 - There's no specific task that I need Eula to handle for me. The repository and the coding might be a kinda sloppy and disorganised, but whenever I get an idea in my head, I'm just gonna add it in. After all, this is my very first time using Git/Github, and this is just my personal helper bot. Nonetheless, do feel free to clone it and play around as you like!
 
 # Customisations
-__/lib/bot/\_\_init\_\_.py__
-- The command prefix can be changed at line 18.
+- The command prefix can be changed at line 18 of __/lib/bot/\_\_init\_\_.py__.
 - Other parameters can be found and edited in ./data/db/auto_params.py
+- The settings for auto weather forecast and auto ip logging can also be edited using the /\set command.

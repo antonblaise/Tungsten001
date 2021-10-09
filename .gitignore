@@ -10,6 +10,6 @@ data/db/ip.log
 __pycache__
 lib/bot/token.0
 data/db/openweathermap_api.0
-.vscode
-data/db/OpenVPN_cert
+.vscode/
+data/db/OpenVPN_cert/
 

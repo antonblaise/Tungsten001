@@ -2,7 +2,9 @@ from random import choice
 from requests import get
 from datetime import datetime
 from discord import Embed
-from data.db.auto_params import *
+from configobj import ConfigObj
+
+config = ConfigObj("./data/db/auto_params.ini")
 
 async def autoWeatherForecast(city):
         api_key = str(open("./data/db/openweathermap_api.0").read())
@@ -25,7 +27,7 @@ async def autoWeatherForecast(city):
             embed = Embed(title=f"{city.upper()}, {datetime.now().strftime('%Y-%m-%d')}", description="6-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
             field = []
             binary = [True,False]
-            for hours in range(len(x['hourly'][0:LENGTH_AUTO_WEATHER])):
+            for hours in range(len(x['hourly'][0:config['AUTO_WEATHER']['length_auto_weather']])):
                     field.append((f"{datetime.utcfromtimestamp(x['hourly'][hours]['dt']+x['timezone_offset']).strftime('%H:%M')} {emojis[icon_codes.index(x['hourly'][hours]['weather'][0]['icon'])]} {str(round(x['hourly'][hours]['temp']-273.15, 2))}°C", 
                                                             x['hourly'][hours]['weather'][0]['description'], binary[hours%2]))
             for name, value, inline in field:

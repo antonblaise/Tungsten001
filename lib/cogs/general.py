@@ -1,3 +1,4 @@
+from typing import Optional
 from discord.ext.commands import Cog, command
 from apscheduler.triggers.cron import CronTrigger
 from discord import File, Embed, Activity, ActivityType
@@ -7,7 +8,10 @@ import os
 from requests import get
 from random import choice
 from datetime import datetime
+from configobj import ConfigObj
+import shutil
 
+config = ConfigObj("./data/db/auto_params.ini")
 bot = Bot()
 
 class General(Cog):
@@ -36,8 +40,6 @@ class General(Cog):
         name=_name, type=getattr(ActivityType, _type, ActivityType.playing)
         ))
 
-    
-
     @command(name="whoisthis", aliases=["whoareyou","bot"], brief='Self introduction from bot' ,hidden=False, pass_context=False)
     async def whoisthis(self, ctx):
         s = int(datetime.now().strftime("%S"))
@@ -56,9 +58,86 @@ class General(Cog):
         await ctx.channel.send(embed=embed)
 
     @command(name="echo", brief='Repeat after me', hidden=True, pass_context=False)
-    async def echo(self, ctx, arg):
-        if not arg == None:
-            await ctx.channel.send(arg)
+    async def echo(self, ctx, arg1, arg2):
+        if not arg1 == None:
+            await ctx.channel.send(arg1)
+            if not arg2 == None:
+                await ctx.channel.send(arg2)
+
+    # Settings changer
+    @command(name="set", brief="Change settings", hidden=False, pass_context=True)
+    async def setting(self, ctx, function: Optional[str], feature: Optional[str], *args: Optional[str]):
+        print(f"args = {args}")
+        print(f"tyep of args = {type(args)}")
+        binary_choices = ["on","off","true","false","yes","no"]
+        binary_dict = {
+                        "on": True,
+                        "off": False,
+                        "true": True,
+                        "false": False,
+                        "yes": True,
+                        "no": False
+                        }
+        if function == None and feature == None:
+            await ctx.channel.send("/help set")
+        elif feature == None:
+            functions = "hush" if str(function).lower() == "autoip" else "interval | length | city/cities"
+            await ctx.channel.send(f"Please specify a feature. 📝\n     /set {function} < on/off | hours | {functions} >")
+        else:
+            if str(function).lower() == "autoip":
+                if str(feature).lower() in ["hours","hush"]:
+                    if bool(args) == False: # If args is empty
+                        usage = f"< true/yes/on | false/no/off >" if str(feature).lower() == "hush" else f"<which {feature}>"
+                        example = f"true" if str(feature).lower() == "hush" else f"6,12,18"
+                        await ctx.channel.send(f"Usage: /set {function} {feature} {usage}\nExample: /set {function} {feature} {example}")
+                    else: # If args is NOT empty
+                        config['AUTO_IP'][f'{str(feature).lower()}_auto_ip'] = binary_dict[f'{args[0]}']
+                        config.write()
+                        await ctx.channel.send(f"Settings updated successfully.\n     [{str(function).upper()}] {feature}_auto_ip = {binary_dict[f'{str(args[0]).lower()}']}")
+                elif str(feature).lower() in binary_choices:
+                    config['AUTO_IP']['enable_auto_ip'] = binary_dict[f'{str(feature).lower()}']
+                    config.write()
+                    await ctx.channel.send(f"Settings updated successfully.\n     [{str(function).upper()}] enable_auto_ip = {binary_dict[str(feature).lower()]}")
+            elif str(function).lower() == "autoweather":
+                if str(feature).lower() in ["hours","interval","length","cities","city"]:
+                    if bool(args) == False: # If args is empty
+                        if str(feature).lower() in ["hours","cities"]:
+                            usage = f"<which {feature}>"
+                            example = f"6,12,18" if str(feature).lower() == "hours" else "New York, London"
+                        elif str(feature).lower() == "interval":
+                            usage = f"< {feature} >"
+                            example = "1"
+                        elif str(feature).lower() == "length":
+                            usage = f"< how many hours to forecast >"
+                            example = "6"
+                        await ctx.channel.send(f"Usage: /set {function} {feature} {usage}\nExample: /set {function} {feature} {example}")
+                    else:
+                        if str(feature).lower() in ['city','cities']:
+                            feature = 'cities'
+                            # preprocess the arg
+                            a = ""
+                            for i in range(len(args)): a += f"{args[i]} " 
+                            if "," in a:
+                                if len(a.strip().split(', ')) == 1:
+                                    args = a.strip().split(',')
+                                else:
+                                    args = a.strip().split(', ')
+                            else:
+                                args = a.strip()
+                        else:
+                            pass
+                        config['AUTO_WEATHER'][f'{str(feature).lower()}_auto_weather'] = args
+                        config.write()
+                        await ctx.channel.send(f"Settings updated successfully.\n     [{str(function).upper()}] {feature}_auto_weather = {str(args).lower()}")
+                elif str(feature).lower() in binary_choices:
+                    config['AUTO_WEATHER']['enable_auto_weather'] = binary_dict[f'{str(feature).lower()}']
+                    config.write()
+                    await ctx.channel.send(f"Settings updated successfully.\n     [{str(function).upper()}] enable_auto_weather = {binary_dict[str(feature).lower()]}")
+
+    @command(name="reset", brief="Reset all settings", hidden=False, pass_context=False)
+    async def reset(self, ctx):
+        shutil.copyfile('./data/db/default_auto_params.ini', './data/db/auto_params.ini')
+        await ctx.channel.send("All settings and parameters for the auto functions are reset to default.")
 
     @command(name="hello", aliases=["hi","hey"], brief='Greet the bot', hidden=True, pass_context=False)
     async def greet(self, ctx):

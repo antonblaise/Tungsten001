@@ -53,7 +53,7 @@ async def autoLogIp():
             if log_content[1] == get('https://ifconfig.me').content.decode('utf8'):
                 r = f"The IP address has not changed since {log_content[0]}."
             else:
-                log_content[0] = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                log_content[0] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
                 log_content[1] = get('https://ifconfig.me').content.decode('utf8')
                 open(log_path,'w').write('\n'.join(log_content))
                 r = f"IP address has been updated on {log_content[0]}."

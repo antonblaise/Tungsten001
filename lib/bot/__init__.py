@@ -1,4 +1,4 @@
-from random import choice, randint
+from random import choice
 from configobj import ConfigObj
 import requests
 from discord import Intents, Embed, File, DMChannel
@@ -35,7 +35,8 @@ class Ready(object):
             if getattr(self, cog):
                 print(f"[+] {cog} cog is ready!")
             else:
-                print(f"[-] {cog} cog is NOT ready.")
+                pass
+                # print(f"[-] {cog} cog is NOT ready.")
         return all([getattr(self, cog) for cog in COGS])
 
 class TimeKeeper():
@@ -74,7 +75,9 @@ class Bot(BotBase):
         self.guild = None
         self.timekeeper = TimeKeeper()
         self.scheduler = AsyncIOScheduler()
+        self.fiveSecIntv = '0,5,10,15,20,25,30,35,40,45,50,55'
         self.random_eula_stickers = open("./data/db/Eula_chibi.stickers").read().splitlines()
+
         db.autosave(self.scheduler)
         
         super().__init__(
@@ -84,10 +87,15 @@ class Bot(BotBase):
         )
 
     def setup(self):
+        
         for cog in COGS:
             self.load_extension(f"lib.cogs.{cog}")
             print(f">> {cog} cog loaded.")
-        
+
+        while not self.check_ini_file(): # Must make sure autoparams.ini is present first
+            continue
+
+
         print("[+] Setup complete.")
 
     def run(self, version):
@@ -102,6 +110,18 @@ class Bot(BotBase):
 
         print(">> Running bot...")
         super().run(self.TOKEN, reconnect=True)
+
+    def say_hi():
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Hi!")
+
+    async def rescheduleJob(self, jobID, newSchedule):
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] rescheduleJob")
+        self.scheduler.pause()
+        print(f"{[{datetime.now().strftime('%H:%M:%S')}]} Before reschedule: \n{self.scheduler.get_job(jobID)}")
+        self.scheduler.reschedule_job(jobID, trigger=CronTrigger(second=newSchedule))
+        print(f"{[{datetime.now().strftime('%H:%M:%S')}]} After reschedule: \n{self.scheduler.get_job(jobID)}")
+        self.scheduler.resume()
+
 
     async def name_card(self, message):
         s = int(datetime.now().strftime("%S"))
@@ -135,9 +155,9 @@ class Bot(BotBase):
         os.remove(file_path+file_name) # Remove the file to avoid cluttering
 
     async def auto_log_ip(self):
-        if self.config['AUTO_IP']['enable_auto_ip'].lower() == "true":
+        if ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['enable_auto_ip'].lower() == "true":
             res = await autoLogIp()
-            if self.config['AUTO_IP']['hush_auto_ip'].lower() == "true":
+            if ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['hush_auto_ip'].lower() == "true":
                 pass
             else:
                 await self.stdout.send("Doing scheduled IP check... 🧐🧐")
@@ -164,8 +184,8 @@ class Bot(BotBase):
         await message.channel.send(self.ip_report)
 
     async def auto_weather_forecast(self):
-        if self.config['AUTO_WEATHER']['enable_auto_weather'] == "True":
-            cities = self.config['AUTO_WEATHER']['cities_auto_weather']
+        if ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['enable_auto_weather'] == "True":
+            cities = ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['cities_auto_weather']
             for c in cities:
                 embed = await autoWeatherForecast(c)
                 if isinstance(embed, str):
@@ -213,6 +233,21 @@ class Bot(BotBase):
         else:
             await message.channel.send("Sorry, I can't fetch the weather data... :worried:")
 
+    def check_ini_file(self):
+        # print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking if auto_params.ini is still present...")
+        if not os.path.isfile("./data/db/auto_params.ini"): # if the .ini file is gone
+            print(f"[-] The auto_params.ini file does not exist or is gone.")
+            print(f">> Restoring from default_auto_params.ini.")
+            while not os.path.isfile("./data/db/auto_params.ini"):
+                print(">> Loading ...")
+                ini = open("./data/db/default_auto_params.ini").read()
+                open("./data/db/auto_params.ini","w").write(ini)
+            print("[+] Done.")
+        else:
+            pass
+            # print(f"[{datetime.now().strftime('%H:%M:%S')}] No issue with auto_params.ini.")
+        return os.path.isfile("./data/db/auto_params.ini")
+        
     def on_connect(self):
         print(f"[+] Bot connected.")
 
@@ -236,19 +271,13 @@ class Bot(BotBase):
         if not self.ready:
             self.guild = self.get_guild(718122840544641084) # Discord server
             self.stdout = self.get_channel(783349409806024755) # Text channel. self.stdout can be used anywhere in this script
-            if not os.path.isfile("./data/db/auto_params.ini"): # if file doesn't exist
-                print("[-] auto_params.ini doesn't exist. Making one from default_auto_params.ini ...")
-                ini = open("./data/db/default_auto_params.ini").read()
-                open("./data/db/auto_params.ini","w").write(ini)
-                print("[+] Done.")
-            else:
-                print("[+] auto_params.ini already exists. No action needed.")
-            self.config = ConfigObj("./data/db/auto_params.ini")
-            self.scheduler.add_job(self.auto_log_ip, CronTrigger(hour=self.config['AUTO_IP']['hours_auto_ip'])) # Log IP every 6 hours    
-            self.scheduler.add_job(self.auto_weather_forecast, CronTrigger(hour=self.config['AUTO_WEATHER']['hours_auto_weather'])) # Weather forecast
-            self.scheduler.add_job(self.timekeeper.get_period, CronTrigger(second='0,5,10,15,20,25,30,35,40,45,50,55'))
+            self.scheduler.add_job(self.auto_log_ip, CronTrigger(second=ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['hours_auto_ip']), id='auto_ip') # Log IP every 6 hours    
+            self.scheduler.add_job(self.auto_weather_forecast, CronTrigger(second=ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['hours_auto_weather']), id='auto_wf') # Weather forecast
+            self.scheduler.add_job(self.timekeeper.get_period, CronTrigger(second=self.fiveSecIntv))
+            self.scheduler.add_job(self.check_ini_file, CronTrigger(second=self.fiveSecIntv))
             self.scheduler.start()
-
+            
+            
             while not self.cogs_ready.all_ready(): # Wait for all cogs to be ready before doing bot ready
                 await sleep(0.5)
 
@@ -257,7 +286,7 @@ class Bot(BotBase):
 
         else:
             print("[+] Bot reconnected.")
-
+            
     # Messaging
     async def on_message(self, message):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] GOT MESSAGE from {message.author.name}")

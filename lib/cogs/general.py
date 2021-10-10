@@ -65,7 +65,7 @@ class General(Cog):
                 await ctx.channel.send(arg2)
 
     # Settings changer
-    @command(name="set", brief="Edit settings. Run */set* for more detail.", help="Edit settings. Run */set* for more detail.", hidden=False, pass_context=True)
+    @command(name="set", brief="Edit settings. Run \"/set\" for more detail.", help="Edit settings. Run \"/set\" for more detail.", hidden=False, pass_context=True)
     async def setting(self, ctx, function: Optional[str], feature: Optional[str], *args: Optional[str]):
         binary_choices = ["on","off","true","false","yes","no"]
         all_features =  [
@@ -157,21 +157,21 @@ _cities_ - {all_features[14]}
                             nfeature = 'hush'
                             config['AUTO_IP'][f'{nfeature}_auto_ip'] = binary_dict[f'{args[0]}']
                             config.write()
-                            await ctx.channel.send(f"> Settings updated successfully.\n     [{str(function).upper()}] {feature}_auto_ip = {binary_dict[f'{str(args[0]).lower()}']}")
+                            await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {feature}_auto_ip = {binary_dict[f'{str(args[0]).lower()}']}")
                         else: # hours
                             nfeature = 'hours'
                             config['AUTO_IP'][f'{str(nfeature).lower()}_auto_ip'] = args[0]
                             config.write()
-                            await ctx.channel.send(f"> Settings updated successfully.\n     [{str(function).upper()}] {feature}_auto_ip = {args[0]}")
+                            await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {feature}_auto_ip = {args[0]}")
                 elif str(feature).lower() in binary_choices: # If set function on/off
                     config['AUTO_IP']['enable_auto_ip'] = binary_dict[f'{str(feature).lower()}']
                     config.write()
-                    await ctx.channel.send(f"> Settings updated successfully.\n     [{str(function).upper()}] enable_auto_ip = {binary_dict[str(feature).lower()]}")
+                    await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] enable_auto_ip = {binary_dict[str(feature).lower()]}")
                 elif str(feature).lower() == "enable": # Special case, if enable is mentioned
                     if bool(args) == True:
                         config['AUTO_IP'][f'{str(feature).lower()}_auto_ip'] = binary_dict[f'{args[0]}']
                         config.write()
-                        await ctx.channel.send(f"> Settings updated successfully.\n     [{str(function).upper()}] {feature}_auto_ip = {binary_dict[f'{str(args[0]).lower()}']}")
+                        await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {feature}_auto_ip = {binary_dict[f'{str(args[0]).lower()}']}")
                     else:
                         await ctx.channel.send(f"Usage: /set {function} {feature} <true/yes/on | false/no/off>\n     Example: /set {function} {feature} true")
             elif str(function).lower() == "autoweather":
@@ -228,18 +228,18 @@ _cities_ - {all_features[14]}
                             else:
                                 config['AUTO_WEATHER'][f'{str(nfeature).lower()}_auto_weather'] = args
                                 config.write()
-                                await ctx.channel.send(f"> Settings updated successfully.\n     [{str(function).upper()}] {nfeature}_auto_weather = {str(args).lower()}")
+                                await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {nfeature}_auto_weather = {str(args).lower()}")
                         except UnboundLocalError:
                             await ctx.channel.send(f"> Please try again.")
                 elif str(feature).lower() in binary_choices:
                     config['AUTO_WEATHER']['enable_auto_weather'] = binary_dict[f'{str(feature).lower()}']
                     config.write()
-                    await ctx.channel.send(f"> Settings updated successfully.\n     [{str(function).upper()}] enable_auto_weather = {binary_dict[str(feature).lower()]}")
+                    await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] enable_auto_weather = {binary_dict[str(feature).lower()]}")
                 elif str(feature).lower() == "enable": # Special case, if enable is mentioned
                     if bool(args) == True:
                         config['AUTO_WEATHER'][f'{str(feature).lower()}_auto_weather'] = binary_dict[f'{args[0]}']
                         config.write()
-                        await ctx.channel.send(f"> Settings updated successfully.\n     [{str(function).upper()}] {feature}_auto_weather = {binary_dict[f'{str(args[0]).lower()}']}")
+                        await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {feature}_auto_weather = {binary_dict[f'{str(args[0]).lower()}']}")
                     else:
                         await ctx.channel.send(f"> Usage: /set {function} {feature} <true/yes/on | false/no/off>\n     Example: /set {function} {feature} true")
                 else: # If feature not found

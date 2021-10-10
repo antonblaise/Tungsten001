@@ -93,7 +93,7 @@ class Bot(BotBase):
     def run(self, version):
         self.VERSION = version
         os.system('cls' if os.name == 'nt' else 'clear')
-        print(f"\nTungsten001 a.k.a. Eula Lawrence (v{self.VERSION})\n")
+        print(f"\nTungsten001 a.k.a. Eula Lawrence (v{self.VERSION})\n\tby Antonius Blaise\n")
         print(">> Running setup...")
         self.setup()
 
@@ -236,6 +236,13 @@ class Bot(BotBase):
         if not self.ready:
             self.guild = self.get_guild(718122840544641084) # Discord server
             self.stdout = self.get_channel(783349409806024755) # Text channel. self.stdout can be used anywhere in this script
+            if not os.path.isfile("./data/db/auto_params.ini"): # if file doesn't exist
+                print("[-] auto_params.ini doesn't exist. Making one from default_auto_params.ini ...")
+                ini = open("./data/db/default_auto_params.ini").read()
+                open("./data/db/auto_params.ini","w").write(ini)
+                print("[+] Done.")
+            else:
+                print("[+] auto_params.ini already exists. No action needed.")
             self.config = ConfigObj("./data/db/auto_params.ini")
             self.scheduler.add_job(self.auto_log_ip, CronTrigger(hour=self.config['AUTO_IP']['hours_auto_ip'])) # Log IP every 6 hours    
             self.scheduler.add_job(self.auto_weather_forecast, CronTrigger(hour=self.config['AUTO_WEATHER']['hours_auto_weather'])) # Weather forecast

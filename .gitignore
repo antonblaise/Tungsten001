@@ -13,3 +13,4 @@ data/db/openweathermap_api.0
 .vscode/
 data/db/OpenVPN_cert/
 
+data/db/auto_params.ini

@@ -34,7 +34,7 @@ Please run the __requirements.py__ to install the necessary packages for this pr
 
 # Customisations
 - The command prefix can be changed at line 18 of __/lib/bot/\_\_init\_\_.py__.
-- Other parameters can be found and edited in **./data/db/auto_params.ini**, which is **NOT** present until you run the code for the first time. It copies the ./data/db/default_auto_params.ini on first boot, and after that, **auto_params.ini** can be edited freely through the commands **/set \<your input\>** and **/reset**.
+- Other parameters can be found and edited in **./data/db/auto_params.ini**, which is **NOT** present until you run the code for the first time. It copies the **./data/db/default_auto_params.ini** on first boot, and after that, **auto_params.ini** can be edited freely through the commands **/set \<your input\>** and **/reset**.
 - Run **/help set** or **/set**
 
 # Debugging

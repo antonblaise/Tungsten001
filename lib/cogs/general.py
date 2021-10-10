@@ -10,9 +10,20 @@ from random import choice
 from datetime import datetime
 from configobj import ConfigObj
 import shutil
+from time import sleep
+
+bot = Bot()
+
+print(f"[+] auto_params.ini is present.") if bool(ConfigObj("./data/db/auto_params.ini")) else print(f"[-] auto_params.ini is not present.")
+
+while not bool(ConfigObj("./data/db/auto_params.ini")):
+    print(f">> Copy: default_auto_params.ini -> auto_params.ini")
+    ini = open("./data/db/default_auto_params.ini").read()
+    open("./data/db/auto_params.ini","w").write(ini)
+    print("[+] Done") if bool(ConfigObj("./data/db/auto_params.ini")) else print("[-] Failed. Trying again.")
+    sleep(1)
 
 config = ConfigObj("./data/db/auto_params.ini")
-bot = Bot()
 
 class General(Cog):
     def __init__(self, bot):
@@ -39,6 +50,9 @@ class General(Cog):
         await self.bot.change_presence(activity=Activity(
         name=_name, type=getattr(ActivityType, _type, ActivityType.playing)
         ))
+
+    def load_config():
+        config = ConfigObj("./data/db/auto_params.ini")
 
     @command(name="whoisthis", aliases=["whoareyou","bot"], brief='Self introduction from bot', help='Self introduction from bot' ,hidden=False, pass_context=False)
     async def whoisthis(self, ctx):
@@ -73,7 +87,7 @@ class General(Cog):
                             'hush', 'mute',
                             'hours', 'time',
                             'interval', 'intervals', 'step', 'steps', 'period', 'periods',
-                            'length','duration',
+                            'future','forecast',
                             'cities','city'
                         ]
         print(f"[{datetime.now().strftime('%H:%M:%S')}] all_features DONE")
@@ -110,7 +124,7 @@ Auto Weather Forecast: **autoweather**
 /set <function> enable true
 /set <function> hours "4,10,16"
 /set <function> interval 1
-/set <function> length 5
+/set <function> future 5
 /set <function> cities New York, Tokyo
                              """, 
                         False
@@ -121,7 +135,7 @@ Auto Weather Forecast: **autoweather**
 _off_ - no, false
 _hours_ - {all_features[4]}
 _interval_ - {', '.join(all_features[6:11])}
-_length_ - {all_features[12]}
+_future_ - {all_features[12]}
 _cities_ - {all_features[14]}
                              """, 
                         False
@@ -141,7 +155,7 @@ _cities_ - {all_features[14]}
                 await ctx.channel.send(embed=embed)
             else:
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] elif feature == None:")
-                functions = "hush" if str(function).lower() == "autoip" else "interval | length | city/cities"
+                functions = "hush" if str(function).lower() == "autoip" else "interval | future | city/cities"
                 await ctx.channel.send(f"> Please specify a feature. 📝\n     /set {function} <on/off | hours | {functions}>")
         else:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] else: GOING INTO LAYER 2")
@@ -155,6 +169,7 @@ _cities_ - {all_features[14]}
                     else: # If args is NOT empty
                         if str(feature).lower() in all_features[1:3]: # hush
                             nfeature = 'hush'
+                            print(f"[{datetime.now().strftime('%H:%M:%S')}] nfeature = 'hush', args[0] = {args[0]}")
                             config['AUTO_IP'][f'{nfeature}_auto_ip'] = binary_dict[f'{args[0]}']
                             config.write()
                             await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {feature}_auto_ip = {binary_dict[f'{str(args[0]).lower()}']}")
@@ -162,6 +177,7 @@ _cities_ - {all_features[14]}
                             nfeature = 'hours'
                             config['AUTO_IP'][f'{str(nfeature).lower()}_auto_ip'] = args[0]
                             config.write()
+                            await self.bot.rescheduleJob('auto_ip', args[0])
                             await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {feature}_auto_ip = {args[0]}")
                 elif str(feature).lower() in binary_choices: # If set function on/off
                     config['AUTO_IP']['enable_auto_ip'] = binary_dict[f'{str(feature).lower()}']
@@ -192,7 +208,7 @@ _cities_ - {all_features[14]}
                             usage = f"<{feature}>"
                             example = "1"
                         elif str(feature).lower() == all_features[11:13]:
-                            nfeature = 'length'
+                            nfeature = 'future'
                             usage = f"<how many hours to forecast>"
                             example = "6"
                         await ctx.channel.send(f"> Usage: /set {function} {feature} {usage}\n     Example: /set {function} {feature} {example}")
@@ -209,8 +225,8 @@ _cities_ - {all_features[14]}
                                     args = a.strip().split(', ')
                             else:
                                 args = a.strip() # Store the product back into args
-                        elif str(feature).lower() in all_features[5:13]: # Case 2: Interval or length (can only accept one number)
-                            nfeature = 'length' if str(feature).lower() in all_features[11:13] else 'interval'
+                        elif str(feature).lower() in all_features[5:13]: # Case 2: Interval or future (can only accept one number)
+                            nfeature = 'future' if str(feature).lower() in all_features[11:13] else 'interval'
                             if len(args[0].split(',')) == 1:
                                 args = args[0].split(',')[0] # Store the product back into args
                             else:
@@ -228,6 +244,10 @@ _cities_ - {all_features[14]}
                             else:
                                 config['AUTO_WEATHER'][f'{str(nfeature).lower()}_auto_weather'] = args
                                 config.write()
+                                if nfeature == 'hours':
+                                    await self.bot.rescheduleJob('auto_wf', args)
+                                else:
+                                    pass
                                 await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {nfeature}_auto_weather = {str(args).lower()}")
                         except UnboundLocalError:
                             await ctx.channel.send(f"> Please try again.")

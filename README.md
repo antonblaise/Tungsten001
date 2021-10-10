@@ -34,9 +34,9 @@ Please run the __requirements.py__ to install the necessary packages for this pr
 
 # Customisations
 - The command prefix can be changed at line 18 of __/lib/bot/\_\_init\_\_.py__.
-- Other parameters can be found and edited in ./data/db/auto_params.ini, which is **NOT** present until you run the code for the first time. It copies the ./data/db/default_auto_params.ini on first boot, and after that, auto_params.py can be edited freely through the commands **/set \<\your \input \>** and **/reset**.
+- Other parameters can be found and edited in **./data/db/auto_params.ini**, which is **NOT** present until you run the code for the first time. It copies the **./data/db/default_auto_params.ini** on first boot, and after that, **auto_params.ini** can be edited freely through the commands **/set \<your input\>** and **/reset**.
 - Run **/help set** or **/set**
 
 # Debugging
 - When you run launcher.py on a terminal, you can see detailed (or perhaps unintelligible) outputs that can be used for debugging, namely to detect where and what have gone wrong. It's mainly for my personal use, but you can always edit them for your own utilisation inside the scripts anyway.
-- If you receive any sort of error message when starting the program, don't worry. As long as you see "\[+\] Bot ready" and ">> Debigging...", you're ready to go.
+- If you receive any sort of error message when starting the program, don't worry. As long as you see "\[+\] Bot ready" and ">> Debugging...", you're ready to go.

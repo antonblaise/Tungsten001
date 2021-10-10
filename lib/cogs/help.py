@@ -3,12 +3,10 @@ from typing import Optional
 from discord import Embed
 from discord.utils import get
 from discord.ext.menus import MenuPages, ListPageSource
-from discord.ext.commands import Cog
-from discord.ext.commands import command
-
+from discord.ext.commands import Cog, command
 
 def syntax(command):
-	cmd_and_aliases = "|".join([str(command), *command.aliases])
+	cmd_and_aliases = " | ".join([str(command), *command.aliases])
 	params = []
 
 	for key, value in command.params.items():
@@ -30,8 +28,8 @@ class HelpMenu(ListPageSource):
 		offset = (menu.current_page*self.per_page) + 1
 		len_data = len(self.entries)
 
-		embed = Embed(title="Help",
-					  description="Welcome to the Eula help dialog!",
+		embed = Embed(title="Commands",
+					  description="Welcome to the Eula command menu!",
 					  colour=self.ctx.author.colour)
 		embed.set_thumbnail(url=self.ctx.guild.me.avatar_url)
 		embed.set_footer(text=f"{offset:,} - {min(len_data, offset+self.per_page-1):,} of {len_data:,} commands.")
@@ -62,13 +60,13 @@ class Help(Cog):
 		embed.add_field(name="Command description", value=command.help)
 		await ctx.send(embed=embed)
 
-	@command(name="help")
+	@command(name="help", brief="Display this help dialog.")
 	async def show_help(self, ctx, cmd: Optional[str]):
 		"""Shows this message."""
 		if cmd is None:
 			menu = MenuPages(source=HelpMenu(ctx, list(self.bot.commands)),
 							 delete_message_after=True,
-							 timeout=60.0)
+							 timeout=None)
 			await menu.start(ctx)
 
 		else:

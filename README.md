@@ -23,14 +23,13 @@ codenamed the toughest metal on earth, tungsten.
 ## Generate and send OpenVPN certificate
 - By fetching the latest public IP address of my home network, an OpenVPN certificate is generated and sent through a text channel.
 
-## 6-hour weather forecast
-- Weather forecast for a city or town can be given both on request and automatically following a schedule, i.e. once per 4 hours. This feature is powered by OpenWeatherMap.
+## Weather forecast
+- Hourly weather forecast for a city or town can be given both on request and automatically following a schedule, i.e. once per 4 hours. This feature is powered by OpenWeatherMap API.
 
 ## More is on the way!
 - There's no specific task that I need Eula to handle for me. The repository and the coding might be a kinda sloppy and disorganised, but whenever I get an idea in my head, I'm just gonna add it in. After all, this is my very first time using Git/Github, and this is just my personal helper bot. Nonetheless, do feel free to clone it and play around as you like!
 
-# Some basic customisations
-__/lib/bot/\_\_init\_\_.py__
-- The command prefix can be changed at line 18.
-- The cities for auto weather forecast can be changed at line 159.
-- The time for auto IP logging and auto weather forecast can be edited at 226 and 228 respectively.
+# Customisations
+- The command prefix can be changed at line 18 of __/lib/bot/\_\_init\_\_.py__.
+- Other parameters can be found and edited in ./data/db/auto_params.py
+- The settings for auto weather forecast and auto ip logging can also be edited using the /\set command.

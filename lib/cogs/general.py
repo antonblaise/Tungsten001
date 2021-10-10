@@ -40,7 +40,7 @@ class General(Cog):
         name=_name, type=getattr(ActivityType, _type, ActivityType.playing)
         ))
 
-    @command(name="whoisthis", aliases=["whoareyou","bot"], brief='Self introduction from bot' ,hidden=False, pass_context=False)
+    @command(name="whoisthis", aliases=["whoareyou","bot"], brief='Self introduction from bot', help='Self introduction from bot' ,hidden=False, pass_context=False)
     async def whoisthis(self, ctx):
         s = int(datetime.now().strftime("%S"))
         embed = Embed(title="Tungsten001", 
@@ -57,7 +57,7 @@ class General(Cog):
             embed.add_field(name=name, value=value, inline=inline)
         await ctx.channel.send(embed=embed)
 
-    @command(name="echo", brief='Repeat after me', hidden=True, pass_context=False)
+    @command(name="echo", brief='Repeat your sentence.', help='Repeat your sentence.', hidden=True, pass_context=False)
     async def echo(self, ctx, arg1, arg2):
         if not arg1 == None:
             await ctx.channel.send(arg1)
@@ -65,7 +65,7 @@ class General(Cog):
                 await ctx.channel.send(arg2)
 
     # Settings changer
-    @command(name="set", brief="Change settings", hidden=False, pass_context=True)
+    @command(name="set", brief="Edit settings. Run */set* for more detail.", help="Edit settings. Run */set* for more detail.", hidden=False, pass_context=True)
     async def setting(self, ctx, function: Optional[str], feature: Optional[str], *args: Optional[str]):
         binary_choices = ["on","off","true","false","yes","no"]
         all_features =  [
@@ -248,12 +248,12 @@ _cities_ - {all_features[14]}
                 await ctx.channel.send(embed=embed)
                     
 
-    @command(name="reset", brief="Reset all settings", hidden=False, pass_context=False)
+    @command(name="reset", brief="Reset all settings", help="Reset all settings", hidden=False, pass_context=False)
     async def reset(self, ctx):
         shutil.copyfile('./data/db/default_auto_params.ini', './data/db/auto_params.ini')
         await ctx.channel.send("> All settings and parameters for the auto functions are reset to default. ✨")
 
-    @command(name="hello", aliases=["hi","hey"], brief='Greet the bot', hidden=True, pass_context=False)
+    @command(name="hello", aliases=["hi","hey"], brief='Greet the bot', help='Greet the bot', hidden=True, pass_context=False)
     async def greet(self, ctx):
         print(">> HELLO")
         self.hour_now = int(datetime.now().strftime("%H"))
@@ -266,12 +266,12 @@ _cities_ - {all_features[14]}
         good = f"Good {self.period_now}"
         await ctx.send(f"> {choice(('Hello', 'Hi', 'Hey', good))} {ctx.author.mention}!")
 
-    @command(name="ipinfo", aliases=["ipcheck"], brief='Check home network IP info', pass_context=False, hidden=False)
+    @command(name="ipinfo", aliases=["ipcheck"], brief='Check home network IP info', help='Check home network IP info', pass_context=False, hidden=False)
     async def ip_info(self, ctx):
         self.ipInfo = get('https://ipinfo.io/').content.decode('utf8')
         await ctx.send(self.ipInfo)
     
-    @command(name="logip", aliases=["iplog"], brief='Record/Update the IP', pass_context=False, hidden=False)
+    @command(name="logip", aliases=["iplog"], brief='Record/Update the IP', help='Record/Update the IP', pass_context=False, hidden=False)
     async def log_ip(self, ctx):
         print(">> Logging IP")
         log_path = "./data/db/ip.log"
@@ -291,7 +291,7 @@ _cities_ - {all_features[14]}
                 self.ip_report = f"IP address has been updated on {log_content[0]}."
         await ctx.send(self.ip_report)
 
-    @command(name="ovpn", aliases=["vpncert","homevpn"], brief='Send the latest OpenVPN cert', pass_context=False, hidden=False)
+    @command(name="ovpn", aliases=["vpncert","homevpn"], brief='Send the latest OpenVPN cert', help='Send the latest OpenVPN cert', pass_context=False, hidden=False)
     async def send_ovpn(self, ctx):
         timecode = datetime.now().strftime("%d%m%Y-%H%M%S")
         # Generate latest OpenVPN cert

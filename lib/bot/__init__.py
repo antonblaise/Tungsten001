@@ -271,8 +271,8 @@ class Bot(BotBase):
         if not self.ready:
             self.guild = self.get_guild(718122840544641084) # Discord server
             self.stdout = self.get_channel(783349409806024755) # Text channel. self.stdout can be used anywhere in this script
-            self.scheduler.add_job(self.auto_log_ip, CronTrigger(second=ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['hours_auto_ip']), id='auto_ip') # Log IP every 6 hours    
-            self.scheduler.add_job(self.auto_weather_forecast, CronTrigger(second=ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['hours_auto_weather']), id='auto_wf') # Weather forecast
+            self.scheduler.add_job(self.auto_log_ip, CronTrigger(hour=ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['hours_auto_ip']), id='auto_ip') # Log IP every 6 hours    
+            self.scheduler.add_job(self.auto_weather_forecast, CronTrigger(hour=ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['hours_auto_weather']), id='auto_wf') # Weather forecast
             self.scheduler.add_job(self.timekeeper.get_period, CronTrigger(second=self.fiveSecIntv))
             self.scheduler.add_job(self.check_ini_file, CronTrigger(second=self.fiveSecIntv))
             self.scheduler.start()

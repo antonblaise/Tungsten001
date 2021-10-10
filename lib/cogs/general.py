@@ -88,7 +88,7 @@ class General(Cog):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] binary_dict DONE")
         embed = Embed(title="> **/set** - Usage Guide", 
                         description=f"""/set <function> <on/off>
-                                        /set <function> <feature> <input>
+/set <function> <feature> <input>
                                          """,
                         colour=0xFF28D7,
                         timestamp=datetime.utcnow()
@@ -100,29 +100,29 @@ class General(Cog):
                     (
                         "> Functions",
                         """Auto IP Logging: **autoip**
-                            Auto Weather Forecast: **autoweather**
+Auto Weather Forecast: **autoweather**
                              """,
                         False
                     ),
                     (
                         "> Examples with on/off, features and inputs", 
                         """/set <function> off
-                            /set <function> enable true
-                            /set <function> hours "4,10,16"
-                            /set <function> interval 1
-                            /set <function> length 5
-                            /set <function> cities New York, Tokyo
+/set <function> enable true
+/set <function> hours "4,10,16"
+/set <function> interval 1
+/set <function> length 5
+/set <function> cities New York, Tokyo
                              """, 
                         False
                     ),
                     (
                         "> Replaceables", 
                         f"""_on_ - yes, true
-                            _off_ - no, false
-                            _hours_ - {all_features[4]}
-                            _interval_ - {', '.join(all_features[6:11])}
-                            _length_ - {all_features[12]}
-                            _cities_ - {all_features[14]}
+_off_ - no, false
+_hours_ - {all_features[4]}
+_interval_ - {', '.join(all_features[6:11])}
+_length_ - {all_features[12]}
+_cities_ - {all_features[14]}
                              """, 
                         False
                     )]

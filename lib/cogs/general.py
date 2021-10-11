@@ -46,10 +46,12 @@ class General(Cog):
 
     async def set(self):
         _type, _name = self.message.split(" ", maxsplit=1)
-
-        await self.bot.change_presence(activity=Activity(
-        name=_name, type=getattr(ActivityType, _type, ActivityType.playing)
-        ))
+        try:
+            await self.bot.change_presence(activity=Activity(
+            name=_name, type=getattr(ActivityType, _type, ActivityType.playing)
+            ))
+        except ConnectionResetError:
+            print(f"[{datetime.now().strftime('%H:%M:%S')}]\n[-] Error: Connection reset")
 
     def load_config():
         config = ConfigObj("./data/db/auto_params.ini")

@@ -116,11 +116,9 @@ class Bot(BotBase):
 
     async def rescheduleJob(self, jobID, newSchedule):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] rescheduleJob")
-        self.scheduler.pause()
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Before reschedule: \n{self.scheduler.get_job(jobID)}")
-        self.scheduler.reschedule_job(jobID, trigger=CronTrigger(second=newSchedule))
+        self.scheduler.reschedule_job(jobID, trigger=CronTrigger(hour=newSchedule))
         print(f"[{datetime.now().strftime('%H:%M:%S')}] After reschedule: \n{self.scheduler.get_job(jobID)}")
-        self.scheduler.resume()
 
 
     async def name_card(self, message):

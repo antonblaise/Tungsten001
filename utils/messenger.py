@@ -25,7 +25,8 @@ async def directMessage(message):
             await bot.man_log_ip(message)
         else:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] else:")
-            await casualMessaging(message)
+            res_directMessage = await casualMessaging(message)
+            return res_directMessage
     else:
         print(f"[{datetime.now().strftime('%H:%M:%S')}] outer else")
         if bool([ele for ele in ['894108315896938548','@eula'] if(ele in message.content.lower())]):
@@ -36,7 +37,8 @@ async def directMessage(message):
                 return "weather forecast request"
             else:
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] if mention in message.content:")
-                await casualMessaging(message)
+                res_directMessage = await casualMessaging(message)
+                return res_directMessage
         else:
             pass
 

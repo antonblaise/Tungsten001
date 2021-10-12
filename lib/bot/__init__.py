@@ -122,19 +122,20 @@ class Bot(BotBase):
 
 
     async def name_card(self, message):
-        s = int(datetime.now().strftime("%S"))
-        embed = Embed(title="Tungsten001", 
-                            description="Hi, nice to meet you! My name is Eula Lawrence from Mondstadt!",
-                            colour=0x30F9FF,
-                            timestamp=datetime.utcnow()
-                            )
-        eula_gif = ["https://c.tenor.com/-oLI6ZeCrkgAAAAd/eula-genshin-impact.gif", "https://c.tenor.com/RPRayyQVRV0AAAAd/genshin-eula.gif"]
-        embed.set_image(url=eula_gif[s%2])
-        fields = [("Name", "Eula Lawrence", True),
-                    ("Codename", "Tungsten001", True),
-                    ("Specialty", "Home VPN", True)]
-        for name, value, inline in fields:
-            embed.add_field(name=name, value=value, inline=inline)
+        async with self.stdout.typing():
+            s = int(datetime.now().strftime("%S"))
+            embed = Embed(title="> **Tungsten001**", 
+                                description="Hi, nice to meet you! My name is Eula Lawrence from Mondstadt!",
+                                colour=0x30F9FF,
+                                timestamp=datetime.utcnow()
+                                )
+            eula_gif = ["https://c.tenor.com/-oLI6ZeCrkgAAAAd/eula-genshin-impact.gif", "https://c.tenor.com/RPRayyQVRV0AAAAd/genshin-eula.gif"]
+            embed.set_image(url=eula_gif[s%2])
+            fields = [("> Name", "Eula Lawrence", True),
+                        ("> Codename", "Tungsten001", True),
+                        ("> Specialties", "Home VPN\nWeather forecast", True)]
+            for name, value, inline in fields:
+                embed.add_field(name=name, value=value, inline=inline)
         await message.channel.send(embed=embed)
 
     async def send_ovpn(self, message):

@@ -117,9 +117,9 @@ class Bot(BotBase):
     async def rescheduleJob(self, jobID, newSchedule):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] rescheduleJob")
         self.scheduler.pause()
-        print(f"{[{datetime.now().strftime('%H:%M:%S')}]} Before reschedule: \n{self.scheduler.get_job(jobID)}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Before reschedule: \n{self.scheduler.get_job(jobID)}")
         self.scheduler.reschedule_job(jobID, trigger=CronTrigger(second=newSchedule))
-        print(f"{[{datetime.now().strftime('%H:%M:%S')}]} After reschedule: \n{self.scheduler.get_job(jobID)}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] After reschedule: \n{self.scheduler.get_job(jobID)}")
         self.scheduler.resume()
 
 
@@ -195,7 +195,7 @@ class Bot(BotBase):
         else:
             pass
 
-    async def weather_forecast(self, message, place):
+    async def weather_forecast(self, message, place, length):
         api_key = str(open("./data/db/openweathermap_api.0").read())
         
         print(f"[{datetime.now().strftime('%H:%M:%S')}] city = {place}")
@@ -219,12 +219,14 @@ class Bot(BotBase):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Bot.stdout = {bot.stdout}")
         if 'hourly' in x:
             async with self.stdout.typing():
-                self.weather_embed = Embed(title=f"{place.upper()}, {datetime.now().strftime('%Y-%m-%d')}", description="6-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
+                self.weather_embed = Embed(title=f"> **{place.upper()}**, {datetime.now().strftime('%Y-%m-%d')}", description=f"{length}-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
                 field = []
-                binary = [True,False]
-                for hours in range(len(x['hourly'][0:6])):
-                    field.append((f"{datetime.utcfromtimestamp(x['hourly'][hours]['dt']+x['timezone_offset']).strftime('%H:%M')} {emojis[icon_codes.index(x['hourly'][hours]['weather'][0]['icon'])]} {str(round(x['hourly'][hours]['temp']-273.15, 2))}°C", 
-                                                            x['hourly'][hours]['weather'][0]['description'], binary[hours%2]))
+                for hours in range(len(x['hourly'][0:length])):
+                    field.append((
+                        f"{datetime.utcfromtimestamp(x['hourly'][hours]['dt']+x['timezone_offset']).strftime('%H:%M')} {emojis[icon_codes.index(x['hourly'][hours]['weather'][0]['icon'])]}", 
+                        f"> {str(round(x['hourly'][hours]['temp']-273.15, 2))}°C\n> *{str(round(x['hourly'][hours]['feels_like']-273.15, 2))}°C*\n> _{x['hourly'][hours]['weather'][0]['description']}_", 
+                        True
+                                ))
                 for name, value, inline in field:
                     self.weather_embed.add_field(name=name, value=value, inline=inline)
                 self.weather_embed.set_thumbnail(url=choice((self.random_eula_stickers)))
@@ -312,10 +314,23 @@ class Bot(BotBase):
         try:
             if res_directMessage == "weather forecast request":
                 m = message.content.split(" ")
-                city = " ".join(i for i in m[2:])
-                await self.weather_forecast(message, city)
+                n = " ".join(m[2:len(m)-1])
+                if len(n.strip().split(', ')) == 1:
+                    cities = n.strip().split(",")
+                else:
+                    cities = n.strip().split(", ")
+                
+                try:
+                    length = int(m[len(m)-1])
+                except:
+                    length = 6
+
+                for city in cities:
+                    await self.weather_forecast(message, city, length)
             elif res_directMessage == "name card":
                 await self.name_card(message)
+            else:
+                pass
         except:
             pass
     

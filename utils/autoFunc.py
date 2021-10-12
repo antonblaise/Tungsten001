@@ -22,13 +22,15 @@ async def autoWeatherForecast(city):
         random_eula_stickers = open("./data/db/Eula_chibi.stickers").read().splitlines()
         x = get(f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude_parts}&appid={api_key}").json()
         if 'hourly' in x:
-            
-            embed = Embed(title=f"{city.upper()}, {datetime.now().strftime('%Y-%m-%d')}", description=f"{int(ConfigObj('./data/db/auto_params.ini')['AUTO_WEATHER']['future_auto_weather'])}-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
+            embed = Embed(title=f"> **{city.upper()}**, {datetime.now().strftime('%Y-%m-%d')}", description=f"{int(ConfigObj('./data/db/auto_params.ini')['AUTO_WEATHER']['future_auto_weather'])}-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
             field = []
             offset = 0 if int(ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['interval_auto_weather']) == 1 else 1
             for hours in range(0, len(x['hourly'][0:int(ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['future_auto_weather'])]) + offset, int(ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['interval_auto_weather'])):
-                    field.append((f"{datetime.utcfromtimestamp(x['hourly'][hours]['dt']+x['timezone_offset']).strftime('%H:%M')} {emojis[icon_codes.index(x['hourly'][hours]['weather'][0]['icon'])]} {str(round(x['hourly'][hours]['temp']-273.15, 2))}°C", 
-                                                            x['hourly'][hours]['weather'][0]['description'], True))
+                field.append((
+                        f"{datetime.utcfromtimestamp(x['hourly'][hours]['dt']+x['timezone_offset']).strftime('%H:%M')} {emojis[icon_codes.index(x['hourly'][hours]['weather'][0]['icon'])]}", 
+                        f"> {str(round(x['hourly'][hours]['temp']-273.15, 2))}°C\n> *{str(round(x['hourly'][hours]['feels_like']-273.15, 2))}°C*\n> _{x['hourly'][hours]['weather'][0]['description']}_", 
+                        True
+                                ))
             for name, value, inline in field:
                 embed.add_field(name=name, value=value, inline=inline)
             embed.set_thumbnail(url=choice((random_eula_stickers)))

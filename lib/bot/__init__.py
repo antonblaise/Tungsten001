@@ -155,7 +155,9 @@ class Bot(BotBase):
 
     async def auto_log_ip(self):
         if ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['enable_auto_ip'].lower() == "true":
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Doing scheduled IP check... 🧐🧐")
             res = await autoLogIp()
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] {res}")
             if ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['hush_auto_ip'].lower() == "true":
                 pass
             else:
@@ -217,7 +219,7 @@ class Bot(BotBase):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] self.stdout = {self.stdout}")
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Bot.stdout = {bot.stdout}")
         if 'hourly' in x:
-            async with self.stdout.typing():
+            async with message.channel.typing():
                 self.weather_embed = Embed(title=f"> **{place.upper()}**, {datetime.now().strftime('%Y-%m-%d')}", description=f"{length}-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
                 field = []
                 for hours in range(len(x['hourly'][0:length])):
@@ -313,7 +315,12 @@ class Bot(BotBase):
         try:
             if res_directMessage == "weather forecast request":
                 m = message.content.split(" ")
-                n = " ".join(m[2:len(m)-1])
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] m = {m}")
+                if len(m) == 3:
+                    n = m[2]
+                else:
+                    n = " ".join(m[2:len(m)-1])
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] n = {n}")
                 if len(n.strip().split(', ')) == 1:
                     cities = n.strip().split(",")
                 else:
@@ -323,7 +330,7 @@ class Bot(BotBase):
                     length = int(m[len(m)-1])
                 except:
                     length = 6
-
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] cities = {cities}")
                 for city in cities:
                     await self.weather_forecast(message, city, length)
             elif res_directMessage == "name card":

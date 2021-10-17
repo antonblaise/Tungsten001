@@ -167,28 +167,35 @@ class Bot(BotBase):
             pass
         
     async def man_log_ip(self, message):
-        print(">> Logging IP manually")
-        log_path = "./data/db/ip.log"
-        log_content = open(log_path).read().splitlines()
-        if log_content == []:
-            log_content = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n{get('https://ifconfig.me').content.decode('utf8')}"
+        async with message.channel.typing():
+            print(">> Logging IP manually")
+            log_path = "./data/db/ip.log"
             log_content = open(log_path).read().splitlines()
-            self.ip_report = f"IP address has been recorded on {log_content[0]}."
-        else:
-            if log_content[1] == get('https://ifconfig.me').content.decode('utf8'):
-                self.ip_report = f"The IP address has not changed since {log_content[0]}."
+            try:
+                ip_addr = get('https://ifconfig.me').content.decode('utf8')
+            except:
+                ip_addr = get('https://ipinfo.io/ip').content.decode('utf8')
+            if log_content == []:
+                log_content = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n{ip_addr}"
+                log_content = open(log_path).read().splitlines()
+                self.ip_report = f"IP address has been recorded on {log_content[0]}."
             else:
-                log_content[0] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-                log_content[1] = get('https://ifconfig.me').content.decode('utf8')
-                open(log_path,'w').write('\n'.join(log_content))
-                self.ip_report = f"IP address has been updated on {log_content[0]}."
+                if log_content[1] == ip_addr:
+                    self.ip_report = f"The IP address has not changed since {log_content[0]}."
+                else:
+                    log_content[0] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                    log_content[1] = ip_addr
+                    open(log_path,'w').write('\n'.join(log_content))
+                    self.ip_report = f"IP address has been updated on {log_content[0]}."
         await message.channel.send(self.ip_report)
 
     async def auto_weather_forecast(self):
-        if ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['enable_auto_weather'] == "True":
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] {ConfigObj('./data/db/auto_params.ini')['AUTO_WEATHER']['enable_auto_weather'].lower() == 'true'}")
+        if ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['enable_auto_weather'].lower() == "true":
             cities = ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['cities_auto_weather']
             for c in cities:
-                embed = await autoWeatherForecast(c)
+                async with self.stdout.typing():
+                    embed = await autoWeatherForecast(c)
                 if isinstance(embed, str):
                     await self.stdout.send(embed)
                 else:
@@ -215,9 +222,6 @@ class Bot(BotBase):
         lat, lon = geocode[0]['lat'], geocode[0]['lon']
         exclude_parts = "current,minutely,daily,alerts"
         x = get(f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude_parts}&appid={api_key}").json()
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] self = {self}")
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] self.stdout = {self.stdout}")
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] Bot.stdout = {bot.stdout}")
         if 'hourly' in x:
             async with message.channel.typing():
                 self.weather_embed = Embed(title=f"> **{place.upper()}**, {datetime.now().strftime('%Y-%m-%d')}", description=f"{length}-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
@@ -289,7 +293,10 @@ class Bot(BotBase):
 
         else:
             print("[+] Bot reconnected.")
-            
+        
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Auto log ip on boot")
+        await self.auto_log_ip()
+
     # Messaging
     async def on_message(self, message):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] GOT MESSAGE from {message.author.name}")

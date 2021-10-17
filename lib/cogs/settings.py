@@ -27,78 +27,129 @@ class Settings(Cog):
     # Settings changer
     @command(name="set", brief="Edit settings. Run \"/set\" for more detail.", help="Edit settings. Run \"/set\" for more detail.", hidden=False, pass_context=True)
     async def setting(self, ctx, function: Optional[str], feature: Optional[str], *args: Optional[str]):
-        binary_choices = ["on","off","true","false","yes","no"]
-        all_features =  [
-                            'enable',
-                            'hush', 'mute',
-                            'hours', 'time',
-                            'interval', 'intervals', 'step', 'steps', 'period', 'periods',
-                            'future','forecast','length',
-                            'cities','city'
-                        ] # 16 elements (end = 15)
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] all_features DONE")
-        binary_dict = {
-                        "on": True,
-                        "off": False,
-                        "true": True,
-                        "false": False,
-                        "yes": True,
-                        "no": False
-                        }
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] binary_dict DONE")
-        embed = Embed(title="> **/set** - Usage Guide", 
-                        description=f"""/set <function> <on/off>
+        async with ctx.channel.typing():
+            binary_choices = ["on","off","true","false","yes","no"]
+            all_features =  [
+                                'enable',
+                                'hush', 'mute',
+                                'hours', 'time',
+                                'interval', 'intervals', 'step', 'steps', 'period', 'periods',
+                                'future','forecast','length',
+                                'cities','city'
+                            ] # 16 elements (end = 15)
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] all_features DONE")
+            binary_dict = {
+                            "on": True,
+                            "off": False,
+                            "true": True,
+                            "false": False,
+                            "yes": True,
+                            "no": False
+                            }
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] binary_dict DONE")
+            # Embed 1
+            embed = Embed(title="> **/set** - Usage Guide", 
+                            description=f"""/set <function> <on/off>
 /set <function> <feature> <input>
-                                         """,
-                        colour=0xFF28D7,
-                        timestamp=datetime.utcnow()
-                        )
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] embed - Step 1 DONE")
-        embed.set_thumbnail(url="https://c.tenor.com/CgDf35tjlD4AAAAd/eula-genshin-impact.gif")
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] embed - Step 2 DONE")
-        fields = [
-                    (
-                        "> Functions",
-                        """Auto IP Logging: **autoip**
+                                            """,
+                            colour=0xFF28D7,
+                            timestamp=datetime.utcnow()
+                            )
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] embed - Step 1 DONE")
+            
+            embed.set_thumbnail(url="https://c.tenor.com/CgDf35tjlD4AAAAd/eula-genshin-impact.gif")
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] embed - Step 2 DONE")
+            fields = [
+                        (
+                            "> Functions",
+                            """Auto IP Logging: **autoip**
 Auto Weather Forecast: **autoweather**
-                             """,
-                        False
-                    ),
-                    (
-                        "> Examples with on/off, features and inputs", 
-                        """/set <function> off
+                                """,
+                            False
+                        ),
+                        (
+                            "> Examples with on/off, features and inputs", 
+                            """/set <function> off
 /set <function> enable true
 /set <function> hours "4,10,16"
 /set <function> interval 1
 /set <function> future 5
 /set <function> cities New York, Tokyo
-                             """, 
-                        False
-                    ),
-                    (
-                        "> Replaceables", 
-                        f"""_on_ - yes, true
+                                """, 
+                            False
+                        ),
+                        (
+                            "> Replaceables", 
+                            f"""_on_ - yes, true
 _off_ - no, false
 _hours_ - {all_features[4]}
 _interval_ - {', '.join(all_features[6:11])}
 _future_ - {', '.join(all_features[12:14])}
 _cities_ - {all_features[15]}
-                             """, 
-                        False
-                    )]
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] embed - Step 3 DONE")
-        for name, value, inline in fields:
-            embed.add_field(name=name, value=value, inline=inline)
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] embed - Step 4 DONE")
-        
+                                """, 
+                            False
+                        ),
+                        (
+                            "> Show current settings",
+                            f"""/set show
+/set settings
+/set view
+                            """,
+                            False
+                        )]
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] embed - Step 3 DONE")
+            for name, value, inline in fields:
+                embed.add_field(name=name, value=value, inline=inline)
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] embed - Step 4 DONE")
+            
+            # Embed 2
+            embed2 = Embed(title="> **Current settings**", 
+                            description=f"""Current configurations for the auto functions""",
+                            colour=0x00FF32,
+                            timestamp=datetime.utcnow()
+                            )
+            embed2.set_thumbnail(url="https://data.whicdn.com/images/355435488/original.gif")
+            fields2 = [
+                        (
+                            "> Auto IP Logging",
+                            f"""*Enabled* - {'Yes' if ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['enable_auto_ip'].lower() == 'true' else 'No'}
+*Time (24hr format)* - {config['AUTO_IP']['hours_auto_ip']}
+*Muted* - {'Yes' if ConfigObj("./data/db/auto_params.ini")['AUTO_IP']['hush_auto_ip'].lower() == 'true' else 'No'}
+                            """,
+                            False
+                        ),
+                        (
+                            "> Auto Weather Forecast",
+                            f"""*Enabled* - {'Yes' if ConfigObj("./data/db/auto_params.ini")['AUTO_WEATHER']['enable_auto_weather'].lower() == 'true' else 'No'}
+*Time (24hr format)* - {config['AUTO_WEATHER']['hours_auto_weather']}
+*Interval (hours)* - {config['AUTO_WEATHER']['interval_auto_weather']}
+*Hours into the future* - {config['AUTO_WEATHER']['future_auto_weather']}
+*Cities* - {', '.join(config['AUTO_WEATHER']['cities_auto_weather']).title()}
+                            """,
+                            False
+                        ),
+                        (
+                            "> Usage guide",
+                            """/set <function> <on/off>
+/set <function> <feature> <input>
+Run \"/set\" or \"/set help\" for full usage guide.
+                            """,
+                            False
+                        )
+                    ]
+            for name, value, inline in fields2:
+                embed2.add_field(name=name, value=value, inline=inline)
+
         # Start
-        has_error = False# Initially, nothing wrong
+        has_error = False # Initially, nothing wrong
         if function == None and feature == None:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] if function == None and feature == None:")
             await ctx.channel.send(embed=embed)
         elif feature == None:
             if str(function).lower() in ['help','manual','guide']:
                 await ctx.channel.send(embed=embed)
+            elif str(function).lower() in ['show','settings','view']:
+                await ctx.channel.send(embed=embed2)
             else:
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] elif feature == None:")
                 functions = "hush" if str(function).lower() == "autoip" else "interval | future | city/cities"
@@ -136,6 +187,8 @@ _cities_ - {all_features[15]}
                         await ctx.channel.send(f"> Settings updated successfully. ✅\n     [{str(function).upper()}] {feature}_auto_ip = {binary_dict[f'{str(args[0]).lower()}']}")
                     else:
                         await ctx.channel.send(f"Usage: /set {function} {feature} <true/yes/on | false/no/off>\n     Example: /set {function} {feature} true")
+                else: # Feature not found
+                    await ctx.channel.send(f"Sorry {choice(('😣', '😅', '😕'))} \"{feature}\" feature is not available.")
             elif str(function).lower() == "autoweather":
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] elif str(function).lower() == autoweather:")
                 if str(feature).lower() in all_features:

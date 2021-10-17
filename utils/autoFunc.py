@@ -45,17 +45,21 @@ async def autoLogIp():
         log_content = open(log_path).read().splitlines()
         timeNow = datetime.now().strftime("%H:%M:%S")
         dateToday = datetime.now().strftime("%d-%m-%Y")
+        try:
+            ip_addr = get('https://ifconfig.me').content.decode('utf8')
+        except:
+            ip_addr = get('https://ipinfo.io/ip').content.decode('utf8')
         if log_content == []:
-            log_content = f"{dateToday} {timeNow}\n{get('https://ifconfig.me').content.decode('utf8')}"
+            log_content = f"{dateToday} {timeNow}\n{ip_addr}"
             open(log_path,'w').write(log_content)
             log_content = open(log_path).read().splitlines()
             r = f"> IP address has been recorded on {log_content[0]}."
         else:
-            if log_content[1] == get('https://ifconfig.me').content.decode('utf8'):
+            if log_content[1] == ip_addr:
                 r = f"> The IP address has not changed since {log_content[0]}."
             else:
                 log_content[0] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-                log_content[1] = get('https://ifconfig.me').content.decode('utf8')
+                log_content[1] = ip_addr
                 open(log_path,'w').write('\n'.join(log_content))
                 r = f"> IP address has been updated on {log_content[0]}."
         return r

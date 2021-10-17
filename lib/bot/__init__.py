@@ -206,7 +206,6 @@ class Bot(BotBase):
 
     async def weather_forecast(self, message, place, length):
         api_key = str(open("./data/db/openweathermap_api.0").read())
-        
         print(f"[{datetime.now().strftime('%H:%M:%S')}] city = {place}")
         icon_codes = ['01d','02d','03d','04d',
                         '09d','10d','11d','13d',
@@ -224,7 +223,7 @@ class Bot(BotBase):
         exclude_parts = "current,minutely,daily,alerts"
         x = get(f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude_parts}&appid={api_key}").json()
         if 'hourly' in x:
-            async with self.stdout.typing():
+            async with message.channel.typing():
                 self.weather_embed = Embed(title=f"> **{place.upper()}**, {datetime.now().strftime('%Y-%m-%d')}", description=f"{length}-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
                 field = []
                 for hours in range(len(x['hourly'][0:length])):
@@ -308,11 +307,11 @@ class Bot(BotBase):
         print(f"[{datetime.now().strftime('%H:%M:%S')}] cond1: {cond1}; cond2: {cond2}; cond3: {cond3}")
         if cond2 and cond3:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] cond2 and cond3 fulfilled: await self.process_commands(message)")
-            await self.process_commands(message)
-            # Process commands if the message is not a DM and the bot is not mentioned
+            await self.process_commands(message) # Process commands if the message is not a DM and the bot is not mentioned
         elif cond1:  # When someone PMs/tags the bot and the message if NOT from the bot herself
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] cond1 fulfilled")
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] else: await directMessage(message)")
+            async with message.channel.typing():
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] cond1 fulfilled")
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] else: await directMessage(message)")
             res_directMessage = await directMessage(message)
 
         try:

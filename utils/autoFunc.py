@@ -49,6 +49,7 @@ async def autoLogIp():
             ip_addr = get('https://ifconfig.me').content.decode('utf8')
         except:
             ip_addr = get('https://ipinfo.io/ip').content.decode('utf8')
+        
         if log_content == []:
             log_content = f"{dateToday} {timeNow}\n{ip_addr}"
             open(log_path,'w').write(log_content)

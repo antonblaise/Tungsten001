@@ -134,22 +134,24 @@ class Bot(BotBase):
             fields = [("> Name", "Eula Lawrence", True),
                         ("> Codename", "Tungsten001", True),
                         ("> Specialties", "Home VPN\nWeather forecast", True)]
+
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
         await message.channel.send(embed=embed)
 
     async def send_ovpn(self, message):
-        timecode = datetime.now().strftime("%d%m%Y-%H%M%S")
-        # Generate latest OpenVPN cert
-        file_path = "./data/db/OpenVPN_cert/"
-        lines = open(file_path+"SAMPLE.ovpn").read().splitlines()
-        try:
-            ip_addr = get('https://ifconfig.me').content.decode('utf8')
-        except requests.exceptions.ConnectionError:
-            ip_addr = get('https://ipinfo.io/ip').content.decode('utf8')
-        lines[0] = 'remote '+str(ip_addr)+' 1194'
-        file_name = "TCP-Antonius-home_"+str(timecode)+".ovpn"
-        open(file_path+file_name,'w').write('\n'.join(lines))
+        async with message.channel.typing():
+            timecode = datetime.now().strftime("%d%m%Y-%H%M%S")
+            # Generate latest OpenVPN cert
+            file_path = "./data/db/OpenVPN_cert/"
+            lines = open(file_path+"SAMPLE.ovpn").read().splitlines()
+            try:
+                ip_addr = get('https://ifconfig.me').content.decode('utf8')
+            except requests.exceptions.ConnectionError:
+                ip_addr = get('https://ipinfo.io/ip').content.decode('utf8')
+            lines[0] = 'remote '+str(ip_addr)+' 1194'
+            file_name = "TCP-Antonius-home_"+str(timecode)+".ovpn"
+            open(file_path+file_name,'w').write('\n'.join(lines))
         await message.channel.send(file=File(file_path + file_name)) # Send it
         os.remove(file_path+file_name) # Remove the file to avoid cluttering
 

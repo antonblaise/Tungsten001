@@ -122,18 +122,19 @@ class Bot(BotBase):
 
 
     async def name_card(self, message):
-        async with message.channel.typing():
+        async with self.stdout.typing():
             s = int(datetime.now().strftime("%S"))
-            embed = Embed(title="Tungsten001", 
+            embed = Embed(title="> **Tungsten001**", 
                                 description="Hi, nice to meet you! My name is Eula Lawrence from Mondstadt!",
                                 colour=0x30F9FF,
                                 timestamp=datetime.utcnow()
                                 )
             eula_gif = ["https://c.tenor.com/-oLI6ZeCrkgAAAAd/eula-genshin-impact.gif", "https://c.tenor.com/RPRayyQVRV0AAAAd/genshin-eula.gif"]
             embed.set_image(url=eula_gif[s%2])
-            fields = [("Name", "Eula Lawrence", True),
-                        ("Codename", "Tungsten001", True),
-                        ("Specialty", "Home VPN", True)]
+            fields = [("> Name", "Eula Lawrence", True),
+                        ("> Codename", "Tungsten001", True),
+                        ("> Specialties", "Home VPN\nWeather forecast", True)]
+
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
         await message.channel.send(embed=embed)
@@ -224,7 +225,7 @@ class Bot(BotBase):
         exclude_parts = "current,minutely,daily,alerts"
         x = get(f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude_parts}&appid={api_key}").json()
         if 'hourly' in x:
-            async with self.stdout.typing():
+            async with message.channel.typing():
                 self.weather_embed = Embed(title=f"> **{place.upper()}**, {datetime.now().strftime('%Y-%m-%d')}", description=f"{length}-hour weather forecast.", colour=0x30F9FF, timestamp=datetime.utcnow())             
                 field = []
                 for hours in range(len(x['hourly'][0:length])):

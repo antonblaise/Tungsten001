@@ -84,7 +84,7 @@ Auto Weather Forecast: **autoweather**
 _off_ - no, false
 _hours_ - {all_features[4]}
 _interval_ - {', '.join(all_features[6:11])}
-_future_ - {all_features[12:14]}
+_future_ - {', '.join(all_features[12:14])}
 _cities_ - {all_features[15]}
                                 """, 
                             False

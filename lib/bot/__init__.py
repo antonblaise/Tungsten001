@@ -324,20 +324,30 @@ class Bot(BotBase):
             if res_directMessage == "weather forecast request":
                 m = message.content.split(" ")
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] m = {m}")
-                if len(m) == 3:
+                try:
+                    length = int(m[len(m)-1]) # If the command ends with a number
+                    lengthGiven = True
+                    lengthCheck = 4
+                except:
+                    length = 6
+                    lengthGiven = False
+                    lengthCheck = 3
+                
+                if len(m) == lengthCheck: # If name of city only has one word
                     n = m[2]
                 else:
-                    n = " ".join(m[2:len(m)-1])
+                    if lengthGiven:
+                        n = " ".join(m[2:len(m)-1])
+                    else:
+                        n = " ".join(m[2:len(m)])
+                
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] n = {n}")
+                
                 if len(n.strip().split(', ')) == 1:
                     cities = n.strip().split(",")
                 else:
                     cities = n.strip().split(", ")
                 
-                try:
-                    length = int(m[len(m)-1])
-                except:
-                    length = 6
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] cities = {cities}")
                 for city in cities:
                     await self.weather_forecast(message, city, length)

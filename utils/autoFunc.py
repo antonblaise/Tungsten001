@@ -41,6 +41,7 @@ async def autoWeatherForecast(city):
 
 async def autoLogIp():
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Logging IP automatically")
+        open("data/db/ip.log", "a+")
         log_path = "./data/db/ip.log"
         log_content = open(log_path).read().splitlines()
         timeNow = datetime.now().strftime("%H:%M:%S")

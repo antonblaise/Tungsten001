@@ -20,7 +20,7 @@ Please run the __requirements.py__ to install the necessary packages for this pr
 ### Prepare the OpenVPN cert of our own WiFi
 - Go to [your home WiFi router's webpage](192.168.0.1)
 - Here's an [example for TP-Link routers](https://www.tp-link.com/us/support/faq/1239/) that you may follow. The procedures should be similar for other routers.
-- Put the OpenVPN cert in **/data/db/SAMPLE.ovpn**
+- Put the OpenVPN cert in **/data/db/OpenVPN_cert/SAMPLE.ovpn** (Create one if it's not there)
 ### What you can do at first run 
 - The bot responds to `/<command>`, send `/help` to view command lists.
 - To request weather forecast, send: `@<the bot> weather <city or town>`

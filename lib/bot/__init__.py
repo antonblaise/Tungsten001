@@ -92,8 +92,6 @@ class Bot(BotBase):
             print("\n\nSorry, this bot can only run on Windows and Linux. Thank you!\n\n")
             exit()
 
-        open("./data/db/database.db")
-        
         for cog in COGS:
             self.load_extension(f"lib.cogs.{cog}")
             print(f">> {cog} cog loaded.")
@@ -106,6 +104,7 @@ class Bot(BotBase):
 
     def run(self, version):
         self.VERSION = version
+        open("data/db/database.db", "a+")
         os.system('cls' if os.name == 'nt' else 'clear')
         print(f"\nTungsten001 a.k.a. Eula Lawrence (v{self.VERSION})\n\tby Antonius Blaise\n")
         print(f"\tRunning on {platform.system()}\n")

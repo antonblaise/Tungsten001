@@ -5,7 +5,8 @@ codenamed the toughest metal on earth, tungsten.
 # Requirements
 Please run the __requirements.py__ to install the necessary packages for this program.
 
-# Usage
+# Usage - do these before running the bot
+### Prepare Discord bot token and gather IDs
 - Save your Discord bot token in **/lib/bot/token.0** (Create one if it's not there)
 </br>[How to Get a Discord Bot Token](https://www.writebots.com/discord-bot-token/)
 - Modify **/lib/bot/\_\_init\_\_.py** `line 224` with your Discord server ID, 
@@ -13,8 +14,14 @@ Please run the __requirements.py__ to install the necessary packages for this pr
   and `line 19` with your account ID (NOT your username). 
 </br>[Where can I find my User/Server/Message ID?](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)
 - For the IDs mentioned above, you can just right click on them and click "Copy ID".
+### Get your own OpenWeatherMap API key
 - Save your OpenWeatherMap API key in **/data/db/openweathermap_api.0** (Create one if it's not there)
 </br>[OpenWeatherMap API key](https://openweathermap.org/api)
+### Prepare the OpenVPN cert of our own WiFi
+- Go to [your home WiFi router's webpage](192.168.0.1)
+- Here's an [example for TP-Link routers](https://www.tp-link.com/us/support/faq/1239/) that you may follow. The procedures should be similar for other routers.
+- Put the OpenVPN cert in **/data/db/SAMPLE.ovpn**
+### What you can do at first run 
 - The bot responds to `/<command>`, send `/help` to view command lists.
 - To request weather forecast, send: `@<the bot> weather <city or town>`
 - There are several settings that are customisable. Send `/set` to see the full details.

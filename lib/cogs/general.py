@@ -110,7 +110,7 @@ class General(Cog):
         async with ctx.channel.typing():
             timecode = datetime.now().strftime("%d%m%Y-%H%M%S")
             # Generate latest OpenVPN cert
-            file_path = "./data/db/OpenVPN_cert/"
+            file_path = "data/db/OpenVPN_cert/"
             lines = open(file_path+"SAMPLE.ovpn").read().splitlines()
             ip_addr = get('https://ifconfig.me').content.decode('utf8')
             lines[0] = 'remote '+str(ip_addr)+' 1194'

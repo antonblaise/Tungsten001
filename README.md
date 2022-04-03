@@ -13,7 +13,7 @@ Please run the __requirements.py__ to install the necessary packages for this pr
   and `line 19` with your account ID (NOT your username). 
 </br>[Where can I find my User/Server/Message ID?](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)
 - For the IDs mentioned above, you can just right click on them and click "Copy ID".
-- Save your OpenWeatherMap API key in /data/db/openweathermap_api.0 (Create one if it's not there)
+- Save your OpenWeatherMap API key in **/data/db/openweathermap_api.0** (Create one if it's not there)
 </br>[OpenWeatherMap API key](https://openweathermap.org/api)
 - The bot responds to `/<command>`, send `/help` to view command lists.
 - To request weather forecast, send: `@<the bot> weather <city or town>`

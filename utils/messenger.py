@@ -44,7 +44,7 @@ async def directMessage(message):
 
 async def casualMessaging(message):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] casualMessaging")
-    check1 = bool([ele for ele in ["hi","hello","hey"] if(ele in message.content.lower())])
+    check1 = bool([ele for ele in ["hi ","hello","hey"] if(ele in message.content.lower())])
     check2 = bool([ele for ele in ["good morning","good evening","good afternoon"] if(ele in message.content.lower())])
     check3 = bool([ele for ele in ["good night","goodnight","goodnite","g9 ","gud9"] if(ele in message.content.lower())])
     check4 = bool([ele for ele in ["tq ","thank you","thx ","thanks","arigato"] if(ele in message.content.lower())])

@@ -1,19 +1,23 @@
 # Tungsten001
-This is my personal Discord bot, named after my favourite DPS in Genshin Impact, Eula Lawrence,
+This is my personal Discord bot, named after my favourite DPS in [Genshin Impact](https://genshin.hoyoverse.com/en/), Eula Lawrence,
 codenamed the toughest metal on earth, tungsten.
 
 # Requirements
 Please run the __requirements.py__ to install the necessary packages for this program.
 
 # Usage
-- Save your Discord bot token in /lib/bot/token.0 (Create one if it's not there)
-- Modify /lib/bot/\_\_init\_\_.py line 224 with your Discord server ID, 
-  line 225 with the text channel ID that you want the bot to send messages to,
-  and line 19 with your account ID (NOT your username). 
+- Save your Discord bot token in **/lib/bot/token.0** (Create one if it's not there)
+</br>[How to Get a Discord Bot Token](https://www.writebots.com/discord-bot-token/)
+- Modify **/lib/bot/\_\_init\_\_.py** `line 224` with your Discord server ID, 
+  `line 225` with the text channel ID that you want the bot to send messages to,
+  and `line 19` with your account ID (NOT your username). 
+</br>[Where can I find my User/Server/Message ID?](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)
 - For the IDs mentioned above, you can just right click on them and click "Copy ID".
 - Save your OpenWeatherMap API key in /data/db/openweathermap_api.0 (Create one if it's not there)
-- The bot responds to /\<command\>, send /help to view command lists.
-- To request weather forecast, send: @\<the bot\> weather \<city or town\>
+</br>[OpenWeatherMap API key](https://openweathermap.org/api)
+- The bot responds to `/<command>`, send `/help` to view command lists.
+- To request weather forecast, send: `@<the bot> weather <city or town>`
+- There are several settings that are customisable. Send `/set` to see the full details.
 - As a side note, you can also direct message (DM) the bot, but she only responds to some very primitive messages like greetings. Try it out!
 
 # Functions
@@ -33,9 +37,9 @@ Please run the __requirements.py__ to install the necessary packages for this pr
 - There's no specific task that I need Eula to handle for me. The repository and the coding might be a kinda sloppy and disorganised, but whenever I get an idea in my head, I'm just gonna add it in. After all, this is my very first time using Git/Github, and this is just my personal helper bot. Nonetheless, do feel free to clone it and play around as you like!
 
 # Customisations
-- The command prefix can be changed at line 18 of __/lib/bot/\_\_init\_\_.py__.
-- Other parameters can be found and edited in **./data/db/auto_params.ini**, which is **NOT** present until you run the code for the first time. It copies the **./data/db/default_auto_params.ini** on first boot, and after that, **auto_params.ini** can be edited freely through the commands **/set \<your input\>** and **/reset**.
-- Run **/help set** or **/set**
+- The command prefix can be changed at `line 18` of __/lib/bot/\_\_init\_\_.py__.
+- Other parameters can be found and edited in **./data/db/auto_params.ini**, which is **NOT** present until you run the code for the first time. It copies the **./data/db/default_auto_params.ini** on first boot, and after that, **auto_params.ini** can be edited freely through the commands `/set <your input>` and `/reset`.
+- Run `/help set` or `/set` to see the full details.
 
 # Debugging
 - When you run launcher.py on a terminal, you can see detailed (or perhaps unintelligible) outputs that can be used for debugging, namely to detect where and what have gone wrong. It's mainly for my personal use, but you can always edit them for your own utilisation inside the scripts anyway.

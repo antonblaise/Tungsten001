@@ -1,6 +1,3 @@
-DB_PATH = open("./data/db/database.db", "a+")
-BUILD_PATH = open("./data/db/build.sql", "a+")
-
 from random import choice
 from configobj import ConfigObj
 import requests
@@ -20,16 +17,8 @@ from asyncio import sleep
 
 PREFIX = "/"
 OWNER_IDS = [532991098822328322] # Owner
+COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")] if platform.system() == "Windows" else [path.split("/")[-1][:-3] for path in glob("./lib/cogs/*.py")]
 
-if platform.system() == "Windows":
-    splitter=r"\\"
-elif platform.system() == "Linux":
-    splitter=r"/"
-else:
-    print("\n\nSorry, your OS does not support this bot. Please use Windows or Linux. Thank you!\n\n")
-    exit()
-
-COGS = [path.split(splitter)[-1][:-3] for path in glob("./lib/cogs/*.py")]
 # return the name of any cogs in a list
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
@@ -99,6 +88,11 @@ class Bot(BotBase):
         )
 
     def setup(self):
+        if platform.system() not in ['Windows', 'Linux']:
+            print("\n\nSorry, this bot can only run on Windows and Linux. Thank you!\n\n")
+            exit()
+
+        open("./data/db/database.db")
         
         for cog in COGS:
             self.load_extension(f"lib.cogs.{cog}")
@@ -114,6 +108,7 @@ class Bot(BotBase):
         self.VERSION = version
         os.system('cls' if os.name == 'nt' else 'clear')
         print(f"\nTungsten001 a.k.a. Eula Lawrence (v{self.VERSION})\n\tby Antonius Blaise\n")
+        print(f"\tRunning on {platform.system()}\n")
         print(">> Running setup...")
         self.setup()
 

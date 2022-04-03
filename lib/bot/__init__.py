@@ -7,7 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger 
 from requests import get
 from datetime import datetime
-import os
+import os, platform
 from utils.autoFunc import *
 from utils.messenger import *
 from ..db import db
@@ -17,7 +17,16 @@ from asyncio import sleep
 
 PREFIX = "/"
 OWNER_IDS = [532991098822328322] # Owner
-COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
+
+if platform.system() == "Windows":
+    splitter=r"\\"
+elif platform.system() == "Linux":
+    splitter=r"/"
+else:
+    print("\n\nSorry, your OS does not support this bot. Please use Windows or Linux. Thank you!\n\n")
+    exit()
+
+COGS = [path.split(splitter)[-1][:-3] for path in glob("./lib/cogs/*.py")]
 # return the name of any cogs in a list
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 

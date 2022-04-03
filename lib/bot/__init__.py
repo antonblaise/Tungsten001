@@ -1,3 +1,6 @@
+DB_PATH = open("./data/db/database.db", "a+")
+BUILD_PATH = open("./data/db/build.sql", "a+")
+
 from random import choice
 from configobj import ConfigObj
 import requests

@@ -5,6 +5,7 @@
 *.vbs
 *.ovpn
 *.bat
+*.out
 test_tube.py
 data/db/ip.log
 __pycache__

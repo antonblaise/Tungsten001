@@ -15,6 +15,10 @@ from glob import glob
 from discord.ext.commands import (CommandNotFound, BadArgument)
 from asyncio import sleep
 
+# Disable warnings
+import warnings
+warnings.filterwarnings("ignore")
+
 PREFIX = "/"
 OWNER_IDS = [532991098822328322] # Owner
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")] if platform.system() == "Windows" else [path.split("/")[-1][:-3] for path in glob("./lib/cogs/*.py")]

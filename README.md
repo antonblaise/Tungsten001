@@ -51,3 +51,44 @@ Please run the __requirements.py__ to install the necessary packages for this pr
 # Debugging
 - When you run launcher.py on a terminal, you can see detailed (or perhaps unintelligible) outputs that can be used for debugging, namely to detect where and what have gone wrong. It's mainly for my personal use, but you can always edit them for your own utilisation inside the scripts anyway.
 - If you receive any sort of error message when starting the program, don't worry. As long as you see "\[+\] Bot ready" and ">> Debugging...", you're ready to go.
+
+# Error/Warning messages on start
+### TypeError: object NoneType can't be used in 'await' expression
+```
+_ClientEventTask exception was never retrieved
+future: <ClientEventTask state=finished event=on_connect coro=<bound method Bot.on_connect of <lib.bot.Bot object at 0xffffb1517a30>> exception=TypeError("object NoneType can't be used in 'await' expression")>
+Traceback (most recent call last):
+  File "/home/$USER/.local/lib/python3.10/site-packages/discord/client.py", line 348, in _run_event
+    await self.on_error(event_name, *args, **kwargs)
+  File "/home/$USER/.local/lib/python3.10/site-packages/discord/client.py", line 343, in _run_event
+    await coro(*args, **kwargs)
+TypeError: object NoneType can't be used in 'await' expression
+```
+- It is nothing fatal. To eliminate this error message, go to `/home/$USER/.local/lib/python3.10/site-packages/discord/client.py` (on Linux) or `<Your Python installation path>\Lib\site-packages\discord\client.py` (on Windows), `line 341` and edit the function's content as follows:
+```
+async def _run_event(self, coro, event_name, *args, **kwargs):
+        # try:
+        #     await coro(*args, **kwargs)
+        # except asyncio.CancelledError:
+        #     pass
+        # except Exception:
+        #     try:
+        #         await self.on_error(event_name, *args, **kwargs)
+        #     except asyncio.CancelledError:
+        #         pass
+        try:
+            await coro(*args, **kwargs)
+        except:
+            pass
+```
+### PytzUsageWarning
+```
+/home/$USER/.local/lib/python3.10/site-packages/apscheduler/util.py:436: PytzUsageWarning: The localize method is no longer necessary, as this time zone supports the fold attribute (PEP 495). For more details on migrating to a PEP 495-compliant implementation, see https://pytz-deprecation-shim.readthedocs.io/en/latest/migration.html
+  return tzinfo.localize(dt)
+```
+- Include these lines of code at the beginning of `lib/bot/__init__.py`:
+```
+# Disable warnings
+import warnings
+warnings.filterwarnings("ignore")
+```

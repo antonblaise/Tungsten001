@@ -86,7 +86,7 @@ async def _run_event(self, coro, event_name, *args, **kwargs):
 /home/$USER/.local/lib/python3.10/site-packages/apscheduler/util.py:436: PytzUsageWarning: The localize method is no longer necessary, as this time zone supports the fold attribute (PEP 495). For more details on migrating to a PEP 495-compliant implementation, see https://pytz-deprecation-shim.readthedocs.io/en/latest/migration.html
   return tzinfo.localize(dt)
 ```
-- Include these lines of code at the beginning of `lib/bot/__init__.py`:
+- Include these lines of code at the beginning of `/lib/bot/__init__.py` to disble all warnings:
 ```
 # Disable warnings
 import warnings

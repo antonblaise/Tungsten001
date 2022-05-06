@@ -213,17 +213,40 @@ Run \"/set\" or \"/set help\" for full usage guide.
                         await ctx.channel.send(f"> Usage: /set {function} {feature} {usage}\n     Example: /set {function} {feature} {example}")
                     else: # If args is NOT empty, process the args to be the correct format for each case scenario
                         print(f"[{datetime.now().strftime('%H:%M:%S')}] <{feature}> Preprocess the arg.")
+                        print(f"[{datetime.now().strftime('%H:%M:%S')}] args = {args}")
                         if str(feature).lower() in all_features[14:16]: # Case 1: Cities
                             nfeature = 'cities'
-                            a = ""
-                            for i in range(len(args)): a += f"{args[i]} " 
-                            if "," in a:
-                                if len(a.strip().split(', ')) == 1:
-                                    args = a.strip().split(',')
-                                else:
-                                    args = a.strip().split(', ')
+
+                            tmp1 = ""
+                            tmp2 = []
+                            tmp3 = []
+
+                            for i in range(len(args)): tmp1 += f"{args[i]} "
+
+                            if "," in tmp1: # If there are more than 1 cities stated, spearated by comma
+                                if len(tmp1.strip().split(', ')) == 1: # If the comma is NOT spaced
+                                    args = tmp1.strip().split(',') 
+                                else: # If the comma is spaced
+                                    args = tmp1.strip().split(', ') 
                             else:
-                                args = a.strip() # Store the product back into args
+                                args = list(tmp1.split("***")) 
+                                # *** can be anything else, just to specify where to split the input.
+                                # Since only one city, it reads the whole name, no matter if there is any spacing or special character,
+                                # it will only split when it reads ***.
+
+                            for i in args:
+                                if "," in i: 
+                                    # If any of the elements still contain comma, 
+                                    # meaning if any cities are still combined,
+                                    # i.e. ['City 1', 'City 2,City 3,City 4', 'City 5']
+                                    tmp2 = i.split(',')
+                                    for j in range(len(tmp2)):
+                                        tmp3.append(tmp2[j].rstrip()) # Remove trailing spaces
+                                else:
+                                    tmp3.append(i.rstrip()) # Remove trailing spaces
+
+                            args = tmp3
+
                         elif str(feature).lower() in all_features[5:14]: # Case 2: Interval or future (can only accept one number)
                             nfeature = 'future' if str(feature).lower() in all_features[11:14] else 'interval'
                             if len(args[0].split(',')) == 1:
@@ -233,7 +256,11 @@ Run \"/set\" or \"/set help\" for full usage guide.
                                 await ctx.channel.send(f"> /set {function} {feature} <{feature}>\n     Sorry, I can only accept one value for <{feature}>... {choice(('😣', '😅', '😕'))}")
                         elif str(feature).lower() in all_features[3:5]: # Case 3: Hours (can accept one or more numbers)
                             nfeature = 'hours'
-                            args = args[0]
+
+                            tmp1 = ""
+                            for i in range(len(args)): tmp1 += f"{args[i]}"
+                            args = tmp1
+                            
                         else:
                             pass                        
                         # After assigning the correct value to args
